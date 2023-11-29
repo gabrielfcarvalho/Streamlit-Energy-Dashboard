@@ -115,7 +115,7 @@ def display_suggested_energy_distribution(data, selected_month):
 
     if consumption_data:
         df_consumption = pd.DataFrame(consumption_data)
-        fig = px.pie(df_consumption, values='Consumo', names='Localidade', title="Sugestão de Distribuição Baseada no Consumo")
+        fig = px.pie(df_consumption, values='Consumo', names='Localidade', title="Sugestão de Distribuição Baseada no Consumo Total no Mês")
         st.plotly_chart(fig)
     else:
         st.write("Não há dados de consumo para exibir.")
