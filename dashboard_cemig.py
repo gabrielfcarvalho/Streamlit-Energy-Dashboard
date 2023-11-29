@@ -60,7 +60,7 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas):
 
 def setup_sidebar(data):
     with st.sidebar:
-        st.title('Filtros para o Gráfico')
+        st.title('Filtros para os Gráficos')
         tipo_dado = st.selectbox('Selecione o que você gostaria de saber:', ['Consumo Total em kWh', 'Energia Injetada em kWh', 'Energia Gerada em kWh', 
             'Saldo Atual de Geração', 'Consumo Pago em kWh'])
         opcoes_localidades = list(data.keys())
