@@ -126,3 +126,6 @@ with tab2:
     display_monthly_energy_distribution(data, selected_month)
 with st.expander("Veja mais informações"):
     st.write("Detalhes adicionais sobre os dados ou a aplicação.")
+# Container para adicionar elementos dinamicamente
+container = st.container()
+container.write("Você pode adicionar elementos aqui dinamicamente.")
