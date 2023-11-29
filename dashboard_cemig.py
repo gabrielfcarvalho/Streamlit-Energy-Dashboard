@@ -35,7 +35,7 @@ with st.sidebar:
     tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra'))
 
 # Tabs para diferentes visualizações
-tab1, tab2 = st.tabs(["Gráfico", "Distribuição da Energia Gerada"])
+tab1, tab2 = st.tabs(["Gráficos", "Distribuição da Energia Gerada"])
 
 # Função para plotar gráficos de linha ou barra
 def plot_chart(df, title, y_label, chart_type, localidade):
@@ -124,3 +124,5 @@ with tab2:
     # Função para calcular e exibir a porcentagem de energia injetada por mês e a sugestão mensal
     # (Código da função display_monthly_energy_distribution)
     display_monthly_energy_distribution(data, selected_month)
+with st.expander("Veja mais informações"):
+    st.write("Detalhes adicionais sobre os dados ou a aplicação.")
