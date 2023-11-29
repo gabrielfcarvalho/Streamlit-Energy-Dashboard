@@ -18,3 +18,5 @@ streamlit run app.py
 
 Os dados utilizados são fornecidos no arquivo `Dados.xlsx`.
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://energia-fazenda.streamlit.app)
+
