@@ -18,8 +18,12 @@ with st.sidebar:
     st.title('Filtros para o Gráfico')
     tipo_dado = st.selectbox('Selecione o que você gostaria de saber:', ['Consumo Total em kWh', 'Energia Injetada em kWh', 'Energia Gerada em kWh', 
      'Saldo Atual de Geração', 'Consumo Pago em kWh'])
-    opcoes_localidades = list(data.keys()) + ['Todas as Localidades']
-    localidade_selecionada = st.selectbox('Selecione a propriedade:', opcoes_localidades)
+    # Opções de localidades baseadas nas chaves do dicionário de DataFrames
+    opcoes_localidades = list(data.keys())
+    # Permite a seleção de múltiplas localidades
+    localidades_selecionadas = st.multiselect("Selecione as localidades para comparar:",
+                                              options=opcoes_localidades,
+                                              default=opcoes_localidades[0])
     tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra'))
 
     # Separador na sidebar
@@ -35,39 +39,28 @@ with st.sidebar:
 # Tabs para diferentes visualizações
 tab1, tab2 = st.tabs(["Gráficos", "Distribuição da Energia Gerada"])
 
-# Função para plotar gráficos de linha ou barra
-def plot_chart(df, title, y_label, chart_type, localidade):
-    if localidade == 'Todas as Localidades':
-        df_melted = pd.DataFrame()
-        for loc in df.keys():
-            if y_label in df[loc].columns:
-                melted = df[loc].melt(id_vars=['Mês/Ano'], value_vars=[y_label])
-                melted['Localidade'] = loc
-                df_melted = pd.concat([df_melted, melted])
-        if not df_melted.empty:
-            if chart_type == 'Linha':
-                graph = px.line(df_melted, x='Mês/Ano', y=y_label, color='Localidade', title=title)
-            elif chart_type == 'Barra':
-                graph = px.bar(df_melted, x='Mês/Ano', y='value', color='Localidade', barmode='group', title=title)
-        else:
-            st.error(f"Os dados de '{y_label}' não estão disponíveis para todas as localidades.")
-            return
-    else:
+# Função ajustada para filtrar dados baseada em localidades selecionadas
+def plot_chart(df, title, y_label, chart_type, localidades_selecionadas):
+    # Filtrar os dados para incluir apenas as localidades selecionadas
+    df_filtered = pd.DataFrame()
+    for localidade in localidades_selecionadas:
+        if localidade in df:
+            df_loc = df[localidade].copy()
+            df_loc['Localidade'] = localidade  # Adiciona coluna de localidade para diferenciação no gráfico
+            df_filtered = pd.concat([df_filtered, df_loc])
+    
+    if not df_filtered.empty:
         if chart_type == 'Linha':
-            graph = px.line(df[localidade], x='Mês/Ano', y=y_label, color='Localidade', title=title)
+            fig = px.line(df_filtered, x='Mês/Ano', y=y_label, color='Localidade', title=title)
         elif chart_type == 'Barra':
-            graph = px.bar(df[localidade], x='Mês/Ano', y=y_label, color='Localidade', barmode='group', title=title)
-
-    st.plotly_chart(graph, use_container_width=True)
+            fig = px.bar(df_filtered, x='Mês/Ano', y=y_label, color='Localidade', barmode='group', title=title)
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.error("Não foram selecionadas localidades para exibir.")
 
 with tab1:
-    # Exibição dos gráficos com base na seleção do usuário
-    if (localidade_selecionada == 'Todas as Localidades' and all(tipo_dado in df.columns for df in data.values())) or \
-    (localidade_selecionada != 'Todas as Localidades' and tipo_dado in data[localidade_selecionada].columns):
-        titulo_grafico = f"{tipo_grafico} - {tipo_dado} ({localidade_selecionada})"
-        plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidade_selecionada)
-    else:
-        st.error(f"Dados de '{tipo_dado}' não estão disponíveis para '{localidade_selecionada}'.")
+    titulo_grafico = f"{tipo_grafico} - {tipo_dado}"
+    plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas)
 
 # Função para calcular e exibir a porcentagem de energia injetada por mês e a sugestão mensal
 def display_monthly_energy_distribution(data, selected_month):
