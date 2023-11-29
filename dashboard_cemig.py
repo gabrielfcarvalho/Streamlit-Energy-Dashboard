@@ -68,7 +68,7 @@ def plot_chart(df, title, y_label, chart_type, localidade):
         elif chart_type == 'Barra':
             graph = px.bar(df[localidade], x='Mês/Ano', y=y_label, color='Localidade', title=title)
 
-st.plotly_chart(graph, use_container_width=True)
+    st.plotly_chart(graph, use_container_width=True)
 
 # Exibição dos gráficos com base na seleção do usuário
 if (localidade_selecionada == 'Todas as Localidades' and all(tipo_dado in df.columns for df in data.values())) or \
