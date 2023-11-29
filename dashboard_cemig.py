@@ -62,7 +62,7 @@ def setup_sidebar(data):
                                                   default=opcoes_localidades[0])
         tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra'))
         st.write("---")
-        st.title('Filtro para a Distribuição de Energia Gerada')
+        st.title('Filtro para a Distribuição da Energia Gerada')
         meses_disponiveis = data['Sapecado 1']['Mês/Ano'].unique()
         selected_month = st.selectbox('Escolha o mês de referência:', meses_disponiveis)
     return tipo_dado, localidades_selecionadas, tipo_grafico, selected_month
