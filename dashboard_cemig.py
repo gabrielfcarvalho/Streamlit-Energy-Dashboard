@@ -103,7 +103,6 @@ def display_monthly_energy_distribution(data, selected_month):
         st.write("Não há dados de energia injetada para exibir.")
 
 def display_suggested_energy_distribution(data, selected_month):
-    st.write(f"## Sugestão de Distribuição de Energia Baseada no Consumo para o Mês: {selected_month}")
 
     total_consumption = sum(df[df['Mês/Ano'] == selected_month]['Consumo Total em kWh'].sum() for df in data.values())
 
@@ -131,5 +130,6 @@ with tab1:
 # Aba de visualização da distribuição da energia gerada
 with tab2:
     display_monthly_energy_distribution(data, selected_month)
-    display_suggested_energy_distribution(data, selected_month)
+    with st.expander("Visualizar Sugestão de Distribuição Baseada no Consumo"):
+        display_suggested_energy_distribution(data, selected_month)
 
