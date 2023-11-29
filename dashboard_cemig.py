@@ -11,7 +11,7 @@ def load_data():
 data = load_data()
 
 # Título do Dashboard
-st.title('Análise do Consumo e Geração de Energia')
+st.title('Análise Energética')
 
 # Sidebar para seleção de dados
 with st.sidebar:
