@@ -111,7 +111,9 @@ def display_monthly_energy_distribution(data, selected_month):
         suggested_percentage = (consumption / total_consumption_monthly) * 100 if total_consumption_monthly > 0 else 0
         st.write(f"{loc}: {suggested_percentage:.2f}% sugerido com base no consumo")
 
-# Abas para diferentes visualizações
+# Tabs para diferentes visualizações
+tab1, tab2 = st.tabs(["Gráficos", "Distribuição da Energia Gerada"])
+
 with tab1:
     titulo_grafico = f"{tipo_dado} nas propriedades {', '.join(localidades_selecionadas)}"
     plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas)    
