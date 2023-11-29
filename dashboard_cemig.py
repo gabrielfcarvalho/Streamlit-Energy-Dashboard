@@ -64,7 +64,7 @@ def plot_chart(df, title, y_label, chart_type, localidade):
             return
     else:
         if chart_type == 'Linha':
-            graph = px.line(df[locaidade], x='Mês/Ano', y=y_label, color='Localidade', title=title)
+            graph = px.line(df[localidade], x='Mês/Ano', y=y_label, color='Localidade', title=title)
         elif chart_type == 'Barra':
             graph = px.bar(df[localidade], x='Mês/Ano', y=y_label, color='Localidade', title=title)
 
