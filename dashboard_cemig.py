@@ -12,6 +12,7 @@ st.set_page_config(
         'Report a bug': "https://www.extremelycoolapp.com/bug",
         'About': "# This is a header. This is an *extremely* cool app!"
     }
+)
 
 # Função para carregar dados
 @st.cache_data
