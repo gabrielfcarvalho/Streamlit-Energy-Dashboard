@@ -13,16 +13,16 @@ data = load_data()
 # Título do Dashboard
 st.title('Análise Energética')
 
-# Cálculo de métricas para o resumo
+# Cálculo de métricas
 total_consumo = sum(df['Consumo Total em kWh'].sum() for df in data.values())
-total_geracao = data['Sapecado 1']['Energia Gerada em kWh'].sum()  # Asumindo que apenas 'Sapecado 1' gera energia
+total_geracao = data['Sapecado 1']['Energia Gerada em kWh'].sum()  #Apenas 'Sapecado 1' gera energia
 
-# Exibindo as métricas dentro do expander
+# Exibindo as métricas
 col1, col2 = st.columns(2)
 col1.metric("Consumo Total de Energia (kWh)", "{:,.2f} kWh".format(total_consumo).replace(",", "X").replace(".", ",").replace("X", "."))
 col2.metric("Total de Energia Gerada (kWh)", "{:,.2f} kWh".format(total_geracao).replace(",", "X").replace(".", ",").replace("X", "."))
 
-# Sidebar para seleção de dados
+# Sidebar para seleção dos filtros
 with st.sidebar:
     st.title('Filtros para o Gráfico')
     tipo_dado = st.selectbox('Selecione o que você gostaria de saber:', ['Consumo Total em kWh', 'Energia Injetada em kWh', 'Energia Gerada em kWh', 
@@ -48,7 +48,7 @@ with st.sidebar:
 # Tabs para diferentes visualizações
 tab1, tab2 = st.tabs(["Gráficos", "Distribuição da Energia Gerada"])
 
-# Função ajustada para filtrar dados baseada em localidades selecionadas
+# Função para gerar os gráficos com base nos filtros
 def plot_chart(df, title, y_label, chart_type, localidades_selecionadas):
 
     # Verifica se 'Energia Gerada em kWh' foi selecionada sem 'Sapecado 1'
@@ -72,10 +72,6 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas):
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.error("Não foram selecionadas propriedades para exibir.")
-
-with tab1:
-    titulo_grafico = f"{tipo_dado} nas propriedades {localidades_selecionadas}"
-    plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas)
 
 # Função para calcular e exibir a porcentagem de energia injetada por mês e a sugestão mensal
 def display_monthly_energy_distribution(data, selected_month):
@@ -119,7 +115,9 @@ def display_monthly_energy_distribution(data, selected_month):
         suggested_percentage = (consumption / total_consumption_monthly) * 100 if total_consumption_monthly > 0 else 0
         st.write(f"{loc}: {suggested_percentage:.2f}% sugerido com base no consumo")
 
-    
+with tab1:
+    titulo_grafico = f"{tipo_dado} nas propriedades {localidades_selecionadas}"
+    plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas)    
 
 with tab2:
     # Função para calcular e exibir a porcentagem de energia injetada por mês e a sugestão mensal
