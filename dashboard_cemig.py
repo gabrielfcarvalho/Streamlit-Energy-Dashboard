@@ -102,7 +102,24 @@ def display_monthly_energy_distribution(data, selected_month):
     else:
         st.write("Não há dados de energia injetada para exibir.")
 
+def display_suggested_energy_distribution(data, selected_month):
+    st.write(f"## Sugestão de Distribuição de Energia Baseada no Consumo para o Mês: {selected_month}")
 
+    total_consumption = sum(df[df['Mês/Ano'] == selected_month]['Consumo Total em kWh'].sum() for df in data.values())
+
+    consumption_data = []
+    for loc in data.keys():
+        loc_data = data[loc][data[loc]['Mês/Ano'] == selected_month]
+        if not loc_data.empty and 'Consumo Total em kWh' in loc_data.columns:
+            consumption = loc_data['Consumo Total em kWh'].sum()
+            consumption_data.append({'Localidade': loc, 'Consumo': consumption})
+
+    if consumption_data:
+        df_consumption = pd.DataFrame(consumption_data)
+        fig = px.pie(df_consumption, values='Consumo', names='Localidade', title="Sugestão de Distribuição Baseada no Consumo")
+        st.plotly_chart(fig)
+    else:
+        st.write("Não há dados de consumo para exibir.")
 
 # Tabs para diferentes visualizações
 tab1, tab2 = st.tabs(["Gráficos", "Distribuição da Energia Gerada"])
@@ -114,4 +131,5 @@ with tab1:
 # Aba de visualização da distribuição da energia gerada
 with tab2:
     display_monthly_energy_distribution(data, selected_month)
+    display_suggested_energy_distribution(data, selected_month)
 
