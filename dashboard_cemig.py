@@ -28,10 +28,10 @@ def convert_to_datetime(month_year_str):
 # Sidebar para seleção de dados
 with st.sidebar:
     st.title('Filtros para o Gráfico')
-    tipo_dado = st.selectbox('Selecione o tipo de dado:', ['Consumo Total em kWh', 'Energia Injetada em kWh', 'Energia Gerada em kWh', 
+    tipo_dado = st.selectbox('Selecione o que você gostaria de saber:', ['Consumo Total em kWh', 'Energia Injetada em kWh', 'Energia Gerada em kWh', 
      'Saldo Atual de Geração', 'Consumo Pago em kWh'])
     opcoes_localidades = list(data.keys()) + ['Todas as Localidades']
-    localidade_selecionada = st.selectbox('Selecione a localidade:', opcoes_localidades)
+    localidade_selecionada = st.selectbox('Selecione a propriedade:', opcoes_localidades)
     tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra'))
 
     # Separador na sidebar
@@ -43,7 +43,7 @@ with st.sidebar:
     meses_disponiveis = data['Sapecado 1']['Mês/Ano'].unique()
 
     # Selectbox para escolher o mês
-    selected_month = st.selectbox('Escolha o mês:', meses_disponiveis)
+    selected_month = st.selectbox('Escolha o mês de referência:', meses_disponiveis)
 # Tabs para diferentes visualizações
 tab1, tab2 = st.tabs(["Gráficos", "Distribuição da Energia Gerada"])
 
