@@ -41,6 +41,12 @@ tab1, tab2 = st.tabs(["Gráficos", "Distribuição da Energia Gerada"])
 
 # Função ajustada para filtrar dados baseada em localidades selecionadas
 def plot_chart(df, title, y_label, chart_type, localidades_selecionadas):
+
+    # Verifica se 'Energia Gerada em kWh' foi selecionada sem 'Sapecado 1'
+    if y_label == 'Energia Gerada em kWh' and 'Sapecado 1' not in localidades_selecionadas:
+        st.error("A 'Energia Gerada em kWh' está disponível apenas para 'Sapecado 1'. Selecione 'Sapecado 1' para visualizar esse tipo de dado.")
+        return
+
     # Filtrar os dados para incluir apenas as localidades selecionadas
     df_filtered = pd.DataFrame()
     for localidade in localidades_selecionadas:
@@ -56,7 +62,7 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas):
             fig = px.bar(df_filtered, x='Mês/Ano', y=y_label, color='Localidade', barmode='group', title=title)
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.error("Não foram selecionadas localidades para exibir.")
+        st.error("Não foram selecionadas propriedades para exibir.")
 
 with tab1:
     titulo_grafico = f"{tipo_dado} nas propriedades {localidades_selecionadas}"
