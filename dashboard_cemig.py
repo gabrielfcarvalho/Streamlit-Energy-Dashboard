@@ -59,7 +59,7 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas):
         st.error("Não foram selecionadas localidades para exibir.")
 
 with tab1:
-    titulo_grafico = f"{tipo_grafico} - {tipo_dado}"
+    titulo_grafico = f"{tipo_dado} nas propriedades {localidades_selecionadas}"
     plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas)
 
 # Função para calcular e exibir a porcentagem de energia injetada por mês e a sugestão mensal
