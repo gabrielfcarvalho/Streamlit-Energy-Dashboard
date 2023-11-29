@@ -34,6 +34,9 @@ with st.sidebar:
     localidade_selecionada = st.selectbox('Selecione a localidade:', opcoes_localidades)
     tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra'))
 
+# Tabs para diferentes visualizações
+tab1, tab2 = st.tabs(["Gráfico", "Distribuição da Energia Gerada"])
+
 # Função para plotar gráficos de linha ou barra
 def plot_chart(df, title, y_label, chart_type, localidade):
     if localidade == 'Todas as Localidades':
@@ -59,13 +62,14 @@ def plot_chart(df, title, y_label, chart_type, localidade):
 
     st.plotly_chart(graph, use_container_width=True)
 
-# Exibição dos gráficos com base na seleção do usuário
-if (localidade_selecionada == 'Todas as Localidades' and all(tipo_dado in df.columns for df in data.values())) or \
-   (localidade_selecionada != 'Todas as Localidades' and tipo_dado in data[localidade_selecionada].columns):
-    titulo_grafico = f"{tipo_grafico} - {tipo_dado} ({localidade_selecionada})"
-    plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidade_selecionada)
-else:
-    st.error(f"Dados de '{tipo_dado}' não estão disponíveis para '{localidade_selecionada}'.")
+with tab1:
+    # Exibição dos gráficos com base na seleção do usuário
+    if (localidade_selecionada == 'Todas as Localidades' and all(tipo_dado in df.columns for df in data.values())) or \
+    (localidade_selecionada != 'Todas as Localidades' and tipo_dado in data[localidade_selecionada].columns):
+        titulo_grafico = f"{tipo_grafico} - {tipo_dado} ({localidade_selecionada})"
+        plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidade_selecionada)
+    else:
+        st.error(f"Dados de '{tipo_dado}' não estão disponíveis para '{localidade_selecionada}'.")
 
 # Função para calcular e exibir a porcentagem de energia injetada por mês e a sugestão mensal
 def display_monthly_energy_distribution(data, selected_month):
@@ -109,8 +113,8 @@ def display_monthly_energy_distribution(data, selected_month):
         suggested_percentage = (consumption / total_consumption_monthly) * 100 if total_consumption_monthly > 0 else 0
         st.write(f"{loc}: {suggested_percentage:.2f}% sugerido com base no consumo")
 
-# Exibição da distribuição de energia, apenas para 'Energia Injetada em kWh'
-if tipo_dado == 'Energia Injetada em kWh':
+with tab2:
+
     # Usar os meses conforme estão nos dados
     meses_disponiveis = data['Sapecado 1']['Mês/Ano'].unique()
 
