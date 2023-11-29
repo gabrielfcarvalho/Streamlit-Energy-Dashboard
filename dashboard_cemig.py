@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 # Função para carregar dados
-@st.cache_data
+@st.cache
 def load_data():
     return pd.read_excel("Dados.xlsx", sheet_name=None)
 
@@ -11,7 +11,7 @@ def load_data():
 data = load_data()
 
 # Título do Dashboard
-st.title('Consumo e Geração de Energia')
+st.title('Visão Geral de Consumo e Geração de Energia')
 
 # Sidebar para seleção de dados
 with st.sidebar:
