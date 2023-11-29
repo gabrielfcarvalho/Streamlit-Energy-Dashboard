@@ -22,7 +22,7 @@ def convert_to_date(month_year_str):
     }
     mes, ano = month_year_str.split('/')
     ano = int(ano) if len(ano) == 4 else int(ano) + 2000
-    return datetime.date(year=ano, month=meses[mes], day=1)
+    return date(year=ano, month=meses[mes], day=1)
 
 # Depois de carregar os dados, aplique essa função para converter as datas
 for key, df in data.items():
