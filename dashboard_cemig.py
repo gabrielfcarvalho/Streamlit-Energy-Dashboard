@@ -81,27 +81,29 @@ def setup_sidebar(data):
 # Setup sidebar e captura de valores de filtro
 tipo_dado, localidades_selecionadas, tipo_grafico, selected_month = setup_sidebar(data)
 
-# Função para calcular e exibir a porcentagem de energia injetada por mês
 def display_monthly_energy_distribution(data, selected_month):
-    # Encontrar o mês correspondente nos dados
-    month_data = data['Sapecado 1'][data['Sapecado 1']['Mês/Ano'] == selected_month]
-    if month_data.empty:
-        st.error(f"Não há dados disponíveis para o mês: {selected_month}")
-        return
-    
-    total_generated = month_data['Energia Gerada em kWh'].sum()
     st.write(f"## Distribuição de Energia para o Mês: {selected_month}")
 
-    injected_data = []
+    # Inicializando os saldos do mês anterior e a distribuição de energia
+    previous_saldo = {loc: 0 for loc in data.keys() if 'Saldo Atual de Geração' in data[loc].columns}
+    distribuicao_energia = {}
+
     for loc in data.keys():
         loc_data = data[loc][data[loc]['Mês/Ano'] == selected_month]
-        if not loc_data.empty and 'Energia Injetada em kWh' in loc_data.columns:
-            injected = loc_data['Energia Injetada em kWh'].sum()
-            injected_data.append({'Localidade': loc, 'Energia Injetada': injected})
+        if loc_data.empty:
+            continue
 
-    if injected_data:
-        df_injected = pd.DataFrame(injected_data)
-        fig = px.pie(df_injected, values='Energia Injetada', names='Localidade', title="Distribuição de Energia Injetada")
+        injected = loc_data['Energia Injetada em kWh'].sum()
+        current_saldo = loc_data['Saldo Atual de Geração'].sum() if 'Saldo Atual de Geração' in loc_data.columns else 0
+        saldo_diff = max(0, current_saldo - previous_saldo[loc])
+        injected_total = injected + saldo_diff
+        distribuicao_energia[loc] = injected_total
+        previous_saldo[loc] = current_saldo
+
+    # Criando o gráfico de pizza para visualização
+    if distribuicao_energia:
+        df_distribuicao = pd.DataFrame(list(distribuicao_energia.items()), columns=['Localidade', 'Energia Injetada'])
+        fig = px.pie(df_distribuicao, values='Energia Injetada', names='Localidade', title="Distribuição de Energia Injetada")
         st.plotly_chart(fig)
     else:
         st.write("Não há dados de energia injetada para exibir.")
