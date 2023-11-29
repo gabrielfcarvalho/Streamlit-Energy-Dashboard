@@ -25,7 +25,7 @@ def calculate_metrics(data):
     total_geracao = data['Sapecado 1']['Energia Gerada em kWh'].sum()
     periodo_inicial = min(df['Mês/Ano'].min() for df in data.values())
     periodo_final = max(df['Mês/Ano'].max() for df in data.values())
-    periodo_formatado = f"{periodo_inicial.strftime('%b/%Y')} - {periodo_final.strftime('%b/%Y')}"
+    periodo_formatado = f"{periodo_inicial} - {periodo_final}"
     return total_consumo, total_geracao, periodo_formatado
 
 def display_metrics(total_consumo, total_geracao, periodo_formatado):
