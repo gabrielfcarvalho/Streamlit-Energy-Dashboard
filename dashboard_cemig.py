@@ -25,19 +25,14 @@ def convert_to_datetime(month_year_str):
     return datetime(year=ano, month=meses[mes], day=1)
 
 
-# Seleção do tipo de dado para análise
-tipo_dado = st.selectbox(
-    'Selecione o tipo de dado:', 
-    ['Consumo Total em kWh', 'Energia Injetada em kWh', 'Energia Gerada em kWh', 
-     'Saldo Atual de Geração', 'Consumo Pago em kWh']
-)
-
-# Seleção da localidade
-opcoes_localidades = list(data.keys()) + ['Todas as Localidades']
-localidade_selecionada = st.selectbox('Selecione a localidade:', opcoes_localidades)
-
-# Seleção do tipo de gráfico
-tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra'))
+# Sidebar para seleção de dados
+with st.sidebar:
+    st.title('Filtros')
+    tipo_dado = st.selectbox('Selecione o tipo de dado:', ['Consumo Total em kWh', 'Energia Injetada em kWh', 'Energia Gerada em kWh', 
+     'Saldo Atual de Geração', 'Consumo Pago em kWh'])
+    opcoes_localidades = list(data.keys()) + ['Todas as Localidades']
+    localidade_selecionada = st.selectbox('Selecione a localidade:', opcoes_localidades)
+    tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra'))
 
 # Função para plotar gráficos de linha ou barra
 def plot_chart(df, title, y_label, chart_type, localidade):
