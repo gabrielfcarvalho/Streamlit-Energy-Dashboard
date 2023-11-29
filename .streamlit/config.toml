@@ -1,0 +1,8 @@
+# Personalização do tema
+[theme]
+base="light"
+primaryColor="#3466f6"
+backgroundColor="#fff"
+secondaryBackgroundColor="#f0f2f6"
+textColor="#262730"
+font="sans serif"
