@@ -21,7 +21,7 @@ with st.sidebar:
     # Opções de localidades baseadas nas chaves do dicionário de DataFrames
     opcoes_localidades = list(data.keys())
     # Permite a seleção de múltiplas localidades
-    localidades_selecionadas = st.multiselect("Selecione as localidades para comparar:",
+    localidades_selecionadas = st.multiselect("Selecione as propriedades que deseja obter as informações:",
                                               options=opcoes_localidades,
                                               default=opcoes_localidades[0])
     tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra'))
