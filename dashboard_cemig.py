@@ -27,13 +27,23 @@ def convert_to_datetime(month_year_str):
 
 # Sidebar para seleção de dados
 with st.sidebar:
-    st.title('Filtros')
+    st.title('Filtros para o Gráfico')
     tipo_dado = st.selectbox('Selecione o tipo de dado:', ['Consumo Total em kWh', 'Energia Injetada em kWh', 'Energia Gerada em kWh', 
      'Saldo Atual de Geração', 'Consumo Pago em kWh'])
     opcoes_localidades = list(data.keys()) + ['Todas as Localidades']
     localidade_selecionada = st.selectbox('Selecione a localidade:', opcoes_localidades)
     tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra'))
 
+    # Separador na sidebar
+    st.write("---")  # Isso adiciona uma linha horizontal para separar visualmente as seções
+
+    st.title('Filtro para a Distribuição de Energia Gerada')
+        
+    # Usar os meses conforme estão nos dados
+    meses_disponiveis = data['Sapecado 1']['Mês/Ano'].unique()
+
+    # Selectbox para escolher o mês
+    selected_month = st.selectbox('Escolha o mês:', meses_disponiveis)
 # Tabs para diferentes visualizações
 tab1, tab2 = st.tabs(["Gráficos", "Distribuição da Energia Gerada"])
 
@@ -114,18 +124,7 @@ def display_monthly_energy_distribution(data, selected_month):
         st.write(f"{loc}: {suggested_percentage:.2f}% sugerido com base no consumo")
 
 with tab2:
-
-    # Usar os meses conforme estão nos dados
-    meses_disponiveis = data['Sapecado 1']['Mês/Ano'].unique()
-
-    # Selectbox para escolher o mês
-    selected_month = st.selectbox('Escolha o mês:', meses_disponiveis)
-
     # Função para calcular e exibir a porcentagem de energia injetada por mês e a sugestão mensal
-    # (Código da função display_monthly_energy_distribution)
     display_monthly_energy_distribution(data, selected_month)
 with st.expander("Veja mais informações"):
     st.write("Detalhes adicionais sobre os dados ou a aplicação.")
-# Container para adicionar elementos dinamicamente
-container = st.container()
-container.write("Você pode adicionar elementos aqui dinamicamente.")
