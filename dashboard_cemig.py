@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from datetime import date
 
 # Função para carregar dados
 @st.cache_data
@@ -14,20 +13,6 @@ data = load_data()
 # Título do Dashboard
 st.title('Consumo e Geração de Energia')
 
-
-def convert_to_date(month_year_str):
-    meses = {
-        'JAN': 1, 'FEV': 2, 'MAR': 3, 'ABR': 4, 'MAI': 5, 'JUN': 6,
-        'JUL': 7, 'AGO': 8, 'SET': 9, 'OUT': 10, 'NOV': 11, 'DEZ': 12
-    }
-    mes, ano = month_year_str.split('/')
-    ano = int(ano) if len(ano) == 4 else int(ano) + 2000
-    return date(year=ano, month=meses[mes], day=1)
-
-# Depois de carregar os dados, aplique essa função para converter as datas
-for key, df in data.items():
-    df['Mês/Ano'] = df['Mês/Ano'].apply(convert_to_date)
-
 # Sidebar para seleção de dados
 with st.sidebar:
     st.title('Filtros para o Gráfico')
@@ -36,15 +21,6 @@ with st.sidebar:
     opcoes_localidades = list(data.keys()) + ['Todas as Localidades']
     localidade_selecionada = st.selectbox('Selecione a propriedade:', opcoes_localidades)
     tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra'))
-
-    st.write("## Filtro de Data")
-    # Assume que os dados estão ordenados por data. Se não, ordene-os antes de usar.
-    start_date = data[next(iter(data))]['Mês/Ano'].min()
-    end_date = data[next(iter(data))]['Mês/Ano'].max()
-    data_inicio, data_fim = st.date_input("Selecione o intervalo de datas:", [start_date, end_date])
-
-    st.write("## Comparação de Localidades")
-    localidades_selecionadas = st.multiselect("Selecione as localidades para comparar:", options=opcoes_localidades, default=opcoes_localidades[0])
 
     # Separador na sidebar
     st.write("---")  # Isso adiciona uma linha horizontal para separar visualmente as seções
@@ -59,36 +35,37 @@ with st.sidebar:
 # Tabs para diferentes visualizações
 tab1, tab2 = st.tabs(["Gráficos", "Distribuição da Energia Gerada"])
 
-# Função ajustada para plotar gráficos com os filtros aplicados
-def plot_chart(df, title, y_label, chart_type, localidades, start_date, end_date):
-    # Filtrar o DataFrame por localidades selecionadas e intervalo de datas
-    if 'Todas as Localidades' in localidades:
-        localidades = list(df.keys())
-
-    df_filtered = pd.DataFrame()
-    for loc in localidades:
-        if loc in df:
-            loc_df = df[loc]
-            loc_df = loc_df[(loc_df['Mês/Ano'] >= start_date) & (loc_df['Mês/Ano'] <= end_date)]
-            loc_df['Localidade'] = loc  # Adiciona coluna de localidade para diferenciação no gráfico
-            df_filtered = pd.concat([df_filtered, loc_df])
-
-    # Verifica se o DataFrame filtrado não está vazio
-    if not df_filtered.empty:
-        if chart_type == 'Linha':
-            graph = px.line(df_filtered, x='Mês/Ano', y=y_label, color='Localidade', title=title)
-        elif chart_type == 'Barra':
-            graph = px.bar(df_filtered, x='Mês/Ano', y=y_label, color='Localidade', barmode='group', title=title)
-        st.plotly_chart(graph, use_container_width=True)
+# Função para plotar gráficos de linha ou barra
+def plot_chart(df, title, y_label, chart_type, localidade):
+    if localidade == 'Todas as Localidades':
+        df_melted = pd.DataFrame()
+        for loc in df.keys():
+            if y_label in df[loc].columns:
+                melted = df[loc].melt(id_vars=['Mês/Ano'], value_vars=[y_label])
+                melted['Localidade'] = loc
+                df_melted = pd.concat([df_melted, melted])
+        if not df_melted.empty:
+            if chart_type == 'Linha':
+                graph = px.line(df_melted, x='Mês/Ano', y=y_label, color='Localidade', title=title)
+            elif chart_type == 'Barra':
+                graph = px.bar(df_melted, x='Mês/Ano', y='value', color='Localidade', barmode='group', title=title)
+        else:
+            st.error(f"Os dados de '{y_label}' não estão disponíveis para todas as localidades.")
+            return
     else:
-        st.error("Não há dados para o intervalo de datas e localidades selecionadas.")
+        if chart_type == 'Linha':
+            graph = px.line(df[localidade], x='Mês/Ano', y=y_label, color='Localidade', title=title)
+        elif chart_type == 'Barra':
+            graph = px.bar(df[localidade], x='Mês/Ano', y=y_label, color='Localidade', barmode='group', title=title)
+
+    st.plotly_chart(graph, use_container_width=True)
 
 with tab1:
     # Exibição dos gráficos com base na seleção do usuário
     if (localidade_selecionada == 'Todas as Localidades' and all(tipo_dado in df.columns for df in data.values())) or \
     (localidade_selecionada != 'Todas as Localidades' and tipo_dado in data[localidade_selecionada].columns):
-        titulo_grafico = f"{tipo_grafico} - {tipo_dado} ({localidades_selecionadas})"
-        plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas, data_inicio, data_fim)
+        titulo_grafico = f"{tipo_grafico} - {tipo_dado} ({localidade_selecionada})"
+        plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidade_selecionada)
     else:
         st.error(f"Dados de '{tipo_dado}' não estão disponíveis para '{localidade_selecionada}'.")
 
