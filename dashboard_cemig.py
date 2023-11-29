@@ -13,17 +13,6 @@ data = load_data()
 # Título do Dashboard
 st.title('Consumo e Geração de Energia')
 
-# Função para converter strings de mês/ano para datetime
-def convert_to_datetime(month_year_str):
-    meses = {
-        'JAN': 1, 'FEV': 2, 'MAR': 3, 'ABR': 4, 'MAI': 5, 'JUN': 6,
-        'JUL': 7, 'AGO': 8, 'SET': 9, 'OUT': 10, 'NOV': 11, 'DEZ': 12
-    }
-    mes, ano = month_year_str.split('/')
-    ano = int(ano) + 2000
-    return datetime(year=ano, month=meses[mes], day=1)
-
-
 # Sidebar para seleção de dados
 with st.sidebar:
     st.title('Filtros para o Gráfico')
