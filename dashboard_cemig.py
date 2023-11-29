@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime
+import plotly.express as px
 
 # Configurações de estilo para o gráfico
 sns.set_context("notebook", font_scale=2)  # Aumentar a fonte
@@ -55,25 +56,19 @@ def plot_chart(df, title, y_label, chart_type, localidade):
                 df_melted = pd.concat([df_melted, melted])
         if not df_melted.empty:
             if chart_type == 'Linha':
-                sns.lineplot(data=df_melted, x='Mês/Ano', y='value', hue='Localidade', marker="o")
+                graph = px.line(df_melted, x='Mês/Ano', y='value', color='Localidade', title=title)
             elif chart_type == 'Barra':
-                sns.barplot(data=df_melted, x='Mês/Ano', y='value', hue='Localidade')
-            plt.legend(title='Localidade', bbox_to_anchor=(1.05, 1), loc='upper left')  # Legenda fora do gráfico
+                graph = px.bar(df_melted, x='Mês/Ano', y='value', color='Localidade', title=title)
         else:
             st.error(f"Os dados de '{y_label}' não estão disponíveis para todas as localidades.")
             return
     else:
         if chart_type == 'Linha':
-            sns.lineplot(data=df[localidade], x='Mês/Ano', y=y_label, marker="o")
+            graph = px.line(df[locaidade], x='Mês/Ano', y=y_label, color='Localidade', title=title)
         elif chart_type == 'Barra':
-            sns.barplot(data=df[localidade], x='Mês/Ano', y=y_label)
-        plt.legend().remove()  # Remover legenda para localidade específica
-    plt.xticks(rotation=45)
-    plt.title(title)
-    plt.ylabel(y_label)
-    plt.xlabel('Mês/Ano')
-    plt.tight_layout(rect=[0, 0, 0.85, 1])  # Ajustar layout para acomodar a legenda
-    st.pyplot(plt)
+            graph = px.bar(df[localidade], x='Mês/Ano', y=y_label, color='Localidade', title=title)
+
+st.plotly_chart(graph, use_container_width=True)
 
 # Exibição dos gráficos com base na seleção do usuário
 if (localidade_selecionada == 'Todas as Localidades' and all(tipo_dado in df.columns for df in data.values())) or \
