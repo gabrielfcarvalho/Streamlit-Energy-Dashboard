@@ -23,8 +23,8 @@ st.title('Análise Energética')
 def calculate_metrics(data):
     total_consumo = sum(df['Consumo Total em kWh'].sum() for df in data.values())
     total_geracao = data['Sapecado 1']['Energia Gerada em kWh'].sum()
-    periodo_inicial = min(df['Mês/Ano'].min() for df in data.values())
-    periodo_final = max(df['Mês/Ano'].max() for df in data.values())
+    periodo_inicial = data[next(iter(data))]['Mês/Ano'].iloc[0]
+    periodo_final = data[next(iter(data))]['Mês/Ano'].iloc[-1]
     periodo_formatado = f"{periodo_inicial} - {periodo_final}"
     return total_consumo, total_geracao, periodo_formatado
 
