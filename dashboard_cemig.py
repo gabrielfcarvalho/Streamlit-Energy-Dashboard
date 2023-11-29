@@ -23,16 +23,20 @@ st.title('Análise Energética')
 def calculate_metrics(data):
     total_consumo = sum(df['Consumo Total em kWh'].sum() for df in data.values())
     total_geracao = data['Sapecado 1']['Energia Gerada em kWh'].sum()
-    return total_consumo, total_geracao
+    periodo_inicial = min(df['Mês/Ano'].min() for df in data.values())
+    periodo_final = max(df['Mês/Ano'].max() for df in data.values())
+    periodo_formatado = f"{periodo_inicial.strftime('%b/%Y')} - {periodo_final.strftime('%b/%Y')}"
+    return total_consumo, total_geracao, periodo_formatado
 
-def display_metrics(total_consumo, total_geracao):
-    col1, col2 = st.columns(2)
+def display_metrics(total_consumo, total_geracao, periodo_formatado):
+    col1, col2, col3 = st.columns(3)
     col1.metric("Consumo Total de Energia (kWh)", "{:,.2f} kWh".format(total_consumo).replace(",", "X").replace(".", ",").replace("X", "."))
-    col2.metric("Total de Energia Gerada (kWh)", "{:,.2f} kWh".format(total_geracao).replace(",", "X").replace(".", ",").replace("X", "."))
+    col2.metric("Período de Referência", periodo_formatado)
+    col3.metric("Total de Energia Gerada (kWh)", "{:,.2f} kWh".format(total_geracao).replace(",", "X").replace(".", ",").replace("X", "."))
 
 # Cálculo e exibição de métricas
-total_consumo, total_geracao = calculate_metrics(data)
-display_metrics(total_consumo, total_geracao)
+total_consumo, total_geracao, periodo_formatado = calculate_metrics(data)
+display_metrics(total_consumo, total_geracao, periodo_formatado)
 
 # Função para gerar os gráficos
 def plot_chart(df, title, y_label, chart_type, localidades_selecionadas):
