@@ -13,16 +13,6 @@ data = load_data()
 # Título do Dashboard
 st.title('Análise Energética')
 
-# Cálculo de métricas para o resumo
-total_consumo = sum(df['Consumo Total em kWh'].sum() for df in data.values())
-total_geracao = data['Sapecado 1']['Energia Gerada em kWh'].sum()  # Asumindo que apenas 'Sapecado 1' gera energia
-
-# Exibindo as métricas no topo do dashboard
-st.write("# Resumo dos Dados")
-col1, col2 = st.columns(2)
-col1.metric("Consumo Total de Energia (kWh)", f"{total_consumo:,.0f} kWh")
-col2.metric("Total de Energia Gerada (kWh)", f"{total_geracao:,.0f} kWh")
-
 # Sidebar para seleção de dados
 with st.sidebar:
     st.title('Filtros para o Gráfico')
@@ -77,8 +67,7 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas):
 with tab1:
     titulo_grafico = f"{tipo_dado} nas propriedades {localidades_selecionadas}"
     plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas)
-    with st.expander("Veja mais informações"):
-        st.write("Detalhes adicionais sobre os dados ou a aplicação.")
+
 # Função para calcular e exibir a porcentagem de energia injetada por mês e a sugestão mensal
 def display_monthly_energy_distribution(data, selected_month):
     # Encontrar o mês correspondente nos dados
@@ -126,3 +115,13 @@ def display_monthly_energy_distribution(data, selected_month):
 with tab2:
     # Função para calcular e exibir a porcentagem de energia injetada por mês e a sugestão mensal
     display_monthly_energy_distribution(data, selected_month)
+
+    with st.expander("Métricas Importantes"):
+        # Cálculo de métricas para o resumo
+        total_consumo = sum(df['Consumo Total em kWh'].sum() for df in data.values())
+        total_geracao = data['Sapecado 1']['Energia Gerada em kWh'].sum()  # Asumindo que apenas 'Sapecado 1' gera energia
+
+        # Exibindo as métricas dentro do expander
+        col1, col2 = st.columns(2)
+        col1.metric("Consumo Total de Energia (kWh)", f"{total_consumo:,.0f} kWh")
+        col2.metric("Total de Energia Gerada (kWh)", f"{total_geracao:,.0f} kWh")
