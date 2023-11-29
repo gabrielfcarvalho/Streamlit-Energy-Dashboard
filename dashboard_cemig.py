@@ -77,46 +77,32 @@ def setup_sidebar(data):
 # Setup sidebar e captura de valores de filtro
 tipo_dado, localidades_selecionadas, tipo_grafico, selected_month = setup_sidebar(data)
 
-# Função para a distribuição mensal de energia
+# Função para calcular e exibir a porcentagem de energia injetada por mês
 def display_monthly_energy_distribution(data, selected_month):
-    # Processamento de dados
+    # Encontrar o mês correspondente nos dados
     month_data = data['Sapecado 1'][data['Sapecado 1']['Mês/Ano'] == selected_month]
     if month_data.empty:
         st.error(f"Não há dados disponíveis para o mês: {selected_month}")
         return
     
     total_generated = month_data['Energia Gerada em kWh'].sum()
-
     st.write(f"## Distribuição de Energia para o Mês: {selected_month}")
 
-    previous_saldo = {loc: 0 for loc in data.keys() if 'Saldo Atual de Geração' in data[loc].columns}
-
+    injected_data = []
     for loc in data.keys():
         loc_data = data[loc][data[loc]['Mês/Ano'] == selected_month]
-        if loc_data.empty:
-            continue
-        
-        if 'Energia Injetada em kWh' in loc_data.columns and 'Saldo Atual de Geração' in loc_data.columns:
+        if not loc_data.empty and 'Energia Injetada em kWh' in loc_data.columns:
             injected = loc_data['Energia Injetada em kWh'].sum()
-            current_saldo = loc_data['Saldo Atual de Geração'].sum()
-            saldo_diff = max(0, current_saldo - previous_saldo[loc])
-            injected_adjusted = injected + saldo_diff
-            percentage_injected = (injected_adjusted / total_generated) * 100 if total_generated > 0 else 0
-            st.write(f"{loc}: {percentage_injected:.2f}% de energia injetada (ajustado pelo saldo não utilizado)")
-            previous_saldo[loc] = current_saldo
+            injected_data.append({'Localidade': loc, 'Energia Injetada': injected})
 
-    # Sugestão de distribuição baseada no consumo
-    st.write("### Sugestão de Distribuição Baseada no Consumo (%)")
-    total_consumption_monthly = sum(data[loc][data[loc]['Mês/Ano'] == selected_month]['Consumo Total em kWh'].sum() for loc in data.keys() if 'Consumo Total em kWh' in data[loc].columns)
+    if injected_data:
+        df_injected = pd.DataFrame(injected_data)
+        fig = px.pie(df_injected, values='Energia Injetada', names='Localidade', title="Distribuição de Energia Injetada")
+        st.plotly_chart(fig)
+    else:
+        st.write("Não há dados de energia injetada para exibir.")
 
-    for loc in data.keys():
-        loc_data = data[loc][data[loc]['Mês/Ano'] == selected_month]
-        if loc_data.empty or 'Consumo Total em kWh' not in loc_data.columns:
-            continue
 
-        consumption = loc_data['Consumo Total em kWh'].sum()
-        suggested_percentage = (consumption / total_consumption_monthly) * 100 if total_consumption_monthly > 0 else 0
-        st.write(f"{loc}: {suggested_percentage:.2f}% sugerido com base no consumo")
 
 # Tabs para diferentes visualizações
 tab1, tab2 = st.tabs(["Gráficos", "Distribuição da Energia Gerada"])
@@ -125,6 +111,7 @@ with tab1:
     titulo_grafico = f"{tipo_dado} nas propriedades {', '.join(localidades_selecionadas)}"
     plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas)    
 
+# Aba de visualização da distribuição da energia gerada
 with tab2:
     display_monthly_energy_distribution(data, selected_month)
 
