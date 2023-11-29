@@ -56,9 +56,9 @@ def plot_chart(df, title, y_label, chart_type, localidade):
                 df_melted = pd.concat([df_melted, melted])
         if not df_melted.empty:
             if chart_type == 'Linha':
-                graph = px.line(df_melted, x='Mês/Ano', y=y_label, color='Localidade', title=title)
+                graph = px.line(df_melted, x='Mês/Ano', y='value', color='Localidade', title=title)
             elif chart_type == 'Barra':
-                graph = px.bar(df_melted, x='Mês/Ano', y=y_label, color='Localidade', barmode='group', title=title)
+                graph = px.bar(df_melted, x='Mês/Ano', y='value', color='Localidade', barmode='group', title=title)
         else:
             st.error(f"Os dados de '{y_label}' não estão disponíveis para todas as localidades.")
             return
