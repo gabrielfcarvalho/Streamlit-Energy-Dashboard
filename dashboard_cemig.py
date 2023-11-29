@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 # Função para carregar dados
-@st.cache
+@st.cache_data
 def load_data():
     return pd.read_excel("Dados.xlsx", sheet_name=None)
 
@@ -116,12 +116,12 @@ with tab2:
     # Função para calcular e exibir a porcentagem de energia injetada por mês e a sugestão mensal
     display_monthly_energy_distribution(data, selected_month)
 
-    with st.expander("Métricas Importantes"):
-        # Cálculo de métricas para o resumo
-        total_consumo = sum(df['Consumo Total em kWh'].sum() for df in data.values())
-        total_geracao = data['Sapecado 1']['Energia Gerada em kWh'].sum()  # Asumindo que apenas 'Sapecado 1' gera energia
+with st.expander("Métricas Importantes"):
+    # Cálculo de métricas para o resumo
+    total_consumo = sum(df['Consumo Total em kWh'].sum() for df in data.values())
+    total_geracao = data['Sapecado 1']['Energia Gerada em kWh'].sum()  # Asumindo que apenas 'Sapecado 1' gera energia
 
-        # Exibindo as métricas dentro do expander
-        col1, col2 = st.columns(2)
-        col1.metric("Consumo Total de Energia (kWh)", f"{total_consumo:,.0f} kWh")
-        col2.metric("Total de Energia Gerada (kWh)", f"{total_geracao:,.0f} kWh")
+    # Exibindo as métricas dentro do expander
+    col1, col2 = st.columns(2)
+    col1.metric("Consumo Total de Energia (kWh)", f"{total_consumo:,.0f} kWh")
+    col2.metric("Total de Energia Gerada (kWh)", f"{total_geracao:,.0f} kWh")
