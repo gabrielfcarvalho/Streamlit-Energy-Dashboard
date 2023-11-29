@@ -19,8 +19,8 @@ total_geracao = data['Sapecado 1']['Energia Gerada em kWh'].sum()  # Asumindo qu
 
 # Exibindo as métricas dentro do expander
 col1, col2 = st.columns(2)
-col1.metric("Consumo Total de Energia (kWh)", "{:,.2f}".format(total_consumo).replace(",", "X").replace(".", ",").replace("X", "."))
-col2.metric("Total de Energia Gerada (kWh)", "{:,.2f}".format(total_geracao).replace(",", "X").replace(".", ",").replace("X", "."))
+col1.metric("Consumo Total de Energia (kWh)", "{:,.2f} kWh".format(total_consumo).replace(",", "X").replace(".", ",").replace("X", "."))
+col2.metric("Total de Energia Gerada (kWh)", "{:,.2f} kWh".format(total_geracao).replace(",", "X").replace(".", ",").replace("X", "."))
 
 # Sidebar para seleção de dados
 with st.sidebar:
