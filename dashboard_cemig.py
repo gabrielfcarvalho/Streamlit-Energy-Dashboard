@@ -1,12 +1,7 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 from datetime import datetime
 import plotly.express as px
-
-# Configurações de estilo para o gráfico
-sns.set_context("notebook", font_scale=2)  # Aumentar a fonte
 
 # Função para carregar dados
 @st.cache_data

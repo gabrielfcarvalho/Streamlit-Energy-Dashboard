@@ -1,7 +1,5 @@
 streamlit
 pandas
-matplotlib
 openpyxl
-seaborn
 datetime
 plotly
