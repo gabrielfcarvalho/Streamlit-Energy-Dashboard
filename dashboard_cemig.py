@@ -84,26 +84,22 @@ tipo_dado, localidades_selecionadas, tipo_grafico, selected_month = setup_sideba
 def display_monthly_energy_distribution(data, selected_month):
     st.write(f"## Distribuição de Energia para o Mês: {selected_month}")
 
-    # Inicializando os saldos do mês anterior e a distribuição de energia
-    previous_saldo = {loc: 0 for loc in data.keys() if 'Saldo Atual de Geração' in data[loc].columns}
+    total_generated = data['Sapecado 1']['Energia Gerada em kWh'].sum()
     distribuicao_energia = {}
 
     for loc in data.keys():
         loc_data = data[loc][data[loc]['Mês/Ano'] == selected_month]
-        if loc_data.empty:
+        if loc_data.empty or 'Energia Injetada em kWh' not in loc_data.columns:
             continue
 
         injected = loc_data['Energia Injetada em kWh'].sum()
         current_saldo = loc_data['Saldo Atual de Geração'].sum() if 'Saldo Atual de Geração' in loc_data.columns else 0
-        saldo_diff = max(0, current_saldo - previous_saldo[loc])
-        injected_total = injected + saldo_diff
-        distribuicao_energia[loc] = injected_total
-        previous_saldo[loc] = current_saldo
+        distribuicao_energia[loc] = injected + current_saldo
 
-    # Criando o gráfico de pizza para visualização
     if distribuicao_energia:
         df_distribuicao = pd.DataFrame(list(distribuicao_energia.items()), columns=['Localidade', 'Energia Injetada'])
-        fig = px.pie(df_distribuicao, values='Energia Injetada', names='Localidade', title="Distribuição de Energia Injetada")
+        df_distribuicao['Porcentagem Injetada'] = (df_distribuicao['Energia Injetada'] / total_generated) * 100
+        fig = px.pie(df_distribuicao, values='Porcentagem Injetada', names='Localidade', title="Distribuição de Energia Injetada")
         st.plotly_chart(fig)
     else:
         st.write("Não há dados de energia injetada para exibir.")
