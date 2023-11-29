@@ -46,7 +46,6 @@ tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra'))
 
 # Função para plotar gráficos de linha ou barra
 def plot_chart(df, title, y_label, chart_type, localidade):
-    plt.figure(figsize=(20, 10))  # Ajustando o tamanho do gráfico
     if localidade == 'Todas as Localidades':
         df_melted = pd.DataFrame()
         for loc in df.keys():
