@@ -30,8 +30,8 @@ def calculate_metrics(data):
 
 def display_metrics(total_consumo, total_geracao, periodo_formatado):
     col1, col2, col3 = st.columns(3)
-    col1.metric("Consumo Total de Energia (kWh)", "{:,.2f} kWh".format(total_consumo).replace(",", "X").replace(".", ",").replace("X", "."))
-    col2.metric("Período de Referência", periodo_formatado)
+    col1.metric("Período de Referência", periodo_formatado)
+    col2.metric("Consumo Total de Energia (kWh)", "{:,.2f} kWh".format(total_consumo).replace(",", "X").replace(".", ",").replace("X", "."))
     col3.metric("Total de Energia Gerada (kWh)", "{:,.2f} kWh".format(total_geracao).replace(",", "X").replace(".", ",").replace("X", "."))
 
 # Cálculo e exibição de métricas
