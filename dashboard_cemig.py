@@ -87,7 +87,7 @@ with tab1:
     # Exibição dos gráficos com base na seleção do usuário
     if (localidade_selecionada == 'Todas as Localidades' and all(tipo_dado in df.columns for df in data.values())) or \
     (localidade_selecionada != 'Todas as Localidades' and tipo_dado in data[localidade_selecionada].columns):
-        titulo_grafico = f"{tipo_grafico} - {tipo_dado} ({localidade_selecionada})"
+        titulo_grafico = f"{tipo_grafico} - {tipo_dado} ({localidades_selecionadas})"
         plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas, data_inicio, data_fim)
     else:
         st.error(f"Dados de '{tipo_dado}' não estão disponíveis para '{localidade_selecionada}'.")
