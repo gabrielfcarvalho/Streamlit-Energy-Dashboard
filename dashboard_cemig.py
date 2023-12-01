@@ -1,3 +1,5 @@
+#Versao 1.0 Funcionando tudo, porém pode haver confusão em relação a energia injetada, energia compensada, saldo,...
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
