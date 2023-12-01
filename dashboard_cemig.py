@@ -84,14 +84,19 @@ tipo_dado, localidades_selecionadas, tipo_grafico, selected_month = setup_sideba
 def calculate_energy_injected(data, loc, selected_month):
     loc_data = data[loc][data[loc]['Mês/Ano'] == selected_month]
     
-    if not loc_data.empty and 'Energia Injetada em kWh' in loc_data.columns and 'Saldo Atual de Geração' in loc_data.columns:
-        # Calculando a diferença de saldo em relação ao mês anterior
-        loc_data['Saldo Anterior'] = loc_data['Saldo Atual de Geração'].shift(1)
-        loc_data['Variação Saldo'] = loc_data['Saldo Atual de Geração'] - loc_data['Saldo Anterior']
+    if not loc_data.empty:
+        if 'Energia Injetada em kWh' in loc_data.columns:
+            injected = loc_data['Energia Injetada em kWh'].sum()
+        else:
+            injected = 0
 
-        # Ajustando a energia injetada
-        injected = loc_data.iloc[0]['Energia Injetada em kWh']
-        saldo_var = loc_data.iloc[0]['Variação Saldo'] if pd.notna(loc_data.iloc[0]['Variação Saldo']) else 0
+        if 'Saldo Atual de Geração' in loc_data.columns:
+            loc_data['Saldo Anterior'] = loc_data['Saldo Atual de Geração'].shift(1)
+            loc_data['Variação Saldo'] = loc_data.apply(lambda row: row['Saldo Atual de Geração'] - row['Saldo Anterior'] if pd.notnull(row['Saldo Anterior']) else 0, axis=1)
+            saldo_var = loc_data['Variação Saldo'].sum()
+        else:
+            saldo_var = 0
+
         return injected + saldo_var
     return 0
 
