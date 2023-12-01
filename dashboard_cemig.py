@@ -92,7 +92,12 @@ def setup_metrics(data):
     with st.sidebar:
         st.title('Filtros para as Métricas')
         # Criar lista de meses/anos disponíveis
-        all_dates = sorted(set(date for df in data.values() for date in df['Mês/Ano']))
+        # Criar lista de meses/anos mantendo a ordem original
+        all_dates = []
+        for df in data.values():
+            for date in df['Mês/Ano']:
+                if date not in all_dates:
+                    all_dates.append(date)
         # Seletores para escolher o período de referência
         start_period = st.selectbox('Período Inicial', all_dates, index=0)
         end_period = st.selectbox('Período Final', all_dates, index=len(all_dates) - 1)
