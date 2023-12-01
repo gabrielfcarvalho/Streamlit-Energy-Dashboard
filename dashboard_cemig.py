@@ -138,10 +138,8 @@ def display_suggested_energy_distribution(data, selected_month):
 
 # Seletor de páginas na barra lateral
 with st.sidebar:
-    st.title('"***O que você gostaria de analisar?***:thinking_face:"')
-
-
-page = st.sidebar.radio("***O que você gostaria de analisar?***:thinking_face:", ("Métricas", "Gráficos", "Distribuição de Energia e Sugestão"))
+    st.title('# ***O que você gostaria de analisar?***:thinking_face:')
+    page = st.radio("", ("Métricas", "Gráficos", "Distribuição de Energia e Sugestão"))
 
 # Exibindo a página selecionada
 if page == "Métricas":
