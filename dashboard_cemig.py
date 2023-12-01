@@ -103,17 +103,19 @@ def setup_distribution_sidebar(data):
 def setup_metrics(data):
     with st.sidebar:
         st.title('Filtros para as Métricas')
-        # Criar lista de meses/anos disponíveis
         # Criar lista de meses/anos mantendo a ordem original
         all_dates = []
         for df in data.values():
             for date in df['Mês/Ano']:
                 if date not in all_dates:
                     all_dates.append(date)
-        # Seletores para escolher o período de referência
-        start_period = st.selectbox('Data Inicial', all_dates, index=0)
-        end_period = st.selectbox('Data Final', all_dates, index=len(all_dates) - 1)
-        return start_period, end_period
+
+        # Seletores para escolher o período de referência com rótulos
+        start_period_index = st.selectbox('Data Inicial', range(len(all_dates)), format_func=lambda x: all_dates[x])
+        # Atualiza as opções para a data final com base na seleção inicial
+        end_period_index = st.selectbox('Data Final', range(start_period_index, len(all_dates)), format_func=lambda x: all_dates[x])
+
+        return all_dates[start_period_index], all_dates[end_period_index]
 
 # Atualização da função para calcular a energia transferida
 def calculate_energy_transferred(data, loc, selected_month_index):
