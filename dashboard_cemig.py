@@ -127,3 +127,13 @@ def display_suggested_energy_distribution(data, selected_month):
     else:
         st.write("Não há dados de consumo para exibir.")
 
+# Seletor de páginas na barra lateral
+page = st.sidebar.radio("Escolha a página:", ("Métricas", "Gráficos", "Distribuição de Energia e Sugestão"))
+
+# Exibindo a página selecionada
+if page == "Métricas":
+    show_metrics_page()
+elif page == "Gráficos":
+    show_charts_page()
+elif page == "Distribuição de Energia e Sugestão":
+    show_distribution_page()
