@@ -27,7 +27,7 @@ def show_charts_page():
     plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas)
 
 def show_distribution_page():
-    st.title('Distribuição de Energia e Sugestão')
+    st.title('Distribuição de Energia')
     selected_month = setup_distribution_sidebar(data)
     display_monthly_energy_distribution(data, selected_month)
     with st.expander(f"Visualizar Sugestão de Distribuição Baseada no Consumo do mês {selected_month}"):
