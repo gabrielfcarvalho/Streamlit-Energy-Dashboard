@@ -16,8 +16,8 @@ data = load_data()
 # Definição das funções para cada página
 def show_metrics_page():
     st.title('Métricas')
-    setup_metrics()
-    total_consumo, total_geracao, periodo_formatado = calculate_metrics(data)
+    start_date, end_date = setup_metrics(data)
+    total_consumo, total_geracao, periodo_formatado = calculate_metrics(data, start_date, end_date)
     display_metrics(total_consumo, total_geracao, periodo_formatado)
 
 def show_charts_page():
