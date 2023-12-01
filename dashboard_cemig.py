@@ -15,13 +15,13 @@ data = load_data()
 
 # Definição das funções para cada página
 def show_metrics_page():
-    st.title('Métricas de Energia')
+    st.title('Métricas')
     setup_metrics()
     total_consumo, total_geracao, periodo_formatado = calculate_metrics(data)
     display_metrics(total_consumo, total_geracao, periodo_formatado)
 
 def show_charts_page():
-    st.title('Gráficos de Consumo e Geração de Energia')
+    st.title('Gráficos')
     tipo_dado, localidades_selecionadas, tipo_grafico = setup_charts_sidebar(data)
     titulo_grafico = f"{tipo_dado} nas propriedades {', '.join(localidades_selecionadas)}"
     plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas)
