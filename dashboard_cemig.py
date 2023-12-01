@@ -1,5 +1,3 @@
-#Versao 1.0 Funcionando tudo, porém pode haver confusão em relação a energia injetada, energia compensada, saldo,...
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -67,7 +65,7 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas):
 def setup_sidebar(data):
     with st.sidebar:
         st.title('Filtros para os Gráficos')
-        tipo_dado = st.selectbox('Selecione o que você gostaria de saber:', ['Consumo Total em kWh', 'Energia Injetada em kWh', 'Energia Gerada em kWh', 
+        tipo_dado = st.selectbox('Selecione o que você gostaria de saber:', ['Consumo Total em kWh', 'Energia Compensada em kWh', 'Energia Transferida em kWh', 'Energia Gerada em kWh', 
             'Saldo Atual de Geração em kWh', 'Consumo Pago em kWh'])
         opcoes_localidades = list(data.keys())
         localidades_selecionadas = st.multiselect("Selecione as propriedades que deseja obter as informações:",
@@ -83,34 +81,30 @@ def setup_sidebar(data):
 # Setup sidebar e captura de valores de filtro
 tipo_dado, localidades_selecionadas, tipo_grafico, selected_month = setup_sidebar(data)
 
-def calculate_energy_injected(data, loc, selected_month_index):
+# Atualização da função para calcular a energia transferida
+def calculate_energy_transferred(data, loc, selected_month_index):
     loc_data = data[loc]
-    if selected_month_index == 0:  # Primeira linha: considera apenas a energia injetada
-        injected = loc_data.iloc[0]['Energia Injetada em kWh'] if 'Energia Injetada em kWh' in loc_data.columns else 0
-        return injected
+    if selected_month_index == 0:
+        transferred = loc_data.iloc[0]['Energia Transferida em kWh'] if 'Energia Transferida em kWh' in loc_data.columns else 0
+        return transferred
 
     current_month_data = loc_data.iloc[selected_month_index]
-    previous_month_data = loc_data.iloc[selected_month_index - 1]
+    transferred = current_month_data['Energia Transferida em kWh'] if 'Energia Transferida em kWh' in current_month_data else 0
+    return max(0, transferred)
 
-    injected = current_month_data['Energia Injetada em kWh'] if 'Energia Injetada em kWh' in current_month_data else 0
-    current_saldo = current_month_data['Saldo Atual de Geração em kWh'] if 'Saldo Atual de Geração em kWh' in current_month_data else 0
-    prev_saldo = previous_month_data['Saldo Atual de Geração em kWh'] if 'Saldo Atual de Geração em kWh' in previous_month_data else 0
-
-    saldo_diff = current_saldo - prev_saldo
-    return max(0, injected + saldo_diff)
 
 def display_monthly_energy_distribution(data, selected_month):
-    st.write(f"## Distribuição de Energia Injetada para o Mês: {selected_month}")
+    st.write(f"## Distribuição de Energia Transferida para o Mês: {selected_month}")
 
     selected_month_index = data[next(iter(data))]['Mês/Ano'].tolist().index(selected_month)
-    injected_data = [{'Localidade': loc, 'Energia Injetada': calculate_energy_injected(data, loc, selected_month_index)} for loc in data.keys()]
+    transferred_data = [{'Localidade': loc, 'Transferida': calculate_energy_transferred(data, loc, selected_month_index)} for loc in data.keys()]
 
-    if injected_data:
-        df_injected = pd.DataFrame(injected_data)
-        fig = px.pie(df_injected, values='Energia Injetada', names='Localidade', title="Distribuição de Energia Injetada")
+    if transferred_data:
+        df_transferred = pd.DataFrame(transferred_data)
+        fig = px.pie(df_transferred, values='Energia Transferida', names='Localidade', title="Distribuição de Energia Transferida")
         st.plotly_chart(fig)
     else:
-        st.write("Não há dados de energia injetada para exibir.")
+        st.write("Não há dados de energia transferida para exibir.")
 
 def display_suggested_energy_distribution(data, selected_month):
 
