@@ -34,15 +34,20 @@ def show_distribution_page():
         display_suggested_energy_distribution(data, selected_month)
 
 def calculate_metrics(data, start_period, end_period):
-    # Convertendo o período de referência para o formato correto, se necessário
-    # start_period = pd.to_datetime(start_period, format='MMM/YY').date()
-    # end_period = pd.to_datetime(end_period, format='MMM/YY').date()
+    total_consumo = 0
+    total_geracao = 0
 
-    # Calculando o consumo total e a geração total no intervalo selecionado
-    total_consumo = sum(df[(df['Mês/Ano'] >= start_period) & (df['Mês/Ano'] <= end_period)]['Consumo Total em kWh'].sum() for df in data.values())
-    total_geracao = data['Sapecado 1'][(data['Sapecado 1']['Mês/Ano'] >= start_period) & (data['Sapecado 1']['Mês/Ano'] <= end_period)]['Energia Gerada em kWh'].sum()
+    for df in data.values():
+        # Filtra os dados com base no período selecionado
+        filtered_df = df[df['Mês/Ano'].between(start_period, end_period)]
+        total_consumo += filtered_df['Consumo Total em kWh'].sum()
 
-    # Formatando o período para exibição
+    # Filtragem específica para a planilha 'Sapecado 1'
+    if 'Sapecado 1' in data:
+        sapecado_df = data['Sapecado 1']
+        filtered_sapecado = sapecado_df[sapecado_df['Mês/Ano'].between(start_period, end_period)]
+        total_geracao = filtered_sapecado['Energia Gerada em kWh'].sum()
+
     periodo_formatado = f"{start_period} - {end_period}"
     return total_consumo, total_geracao, periodo_formatado
 
