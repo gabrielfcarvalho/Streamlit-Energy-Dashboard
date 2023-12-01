@@ -101,7 +101,7 @@ def display_monthly_energy_distribution(data, selected_month):
 
     if transferred_data:
         df_transferred = pd.DataFrame(transferred_data)
-        fig = px.pie(df_transferred, values='Energia Transferida', names='Localidade', title="Distribuição de Energia Transferida")
+        fig = px.pie(df_transferred, values='Energia Transferida', names='Localidade', title=f"Distribuição de Energia Transferida do mês {selected_month}")
         st.plotly_chart(fig)
     else:
         st.write("Não há dados de energia transferida para exibir.")
@@ -117,7 +117,7 @@ def display_suggested_energy_distribution(data, selected_month):
 
     if consumption_data:
         df_consumption = pd.DataFrame(consumption_data)
-        fig = px.pie(df_consumption, values='Consumo', names='Localidade', title="Sugestão de Distribuição Baseada no Consumo Total do Mês")
+        fig = px.pie(df_consumption, values='Consumo', names='Localidade', title=f"Sugestão de Distribuição Baseada no Consumo Total do Mês {selected_month}")
         st.plotly_chart(fig)
     else:
         st.write("Não há dados de consumo para exibir.")
