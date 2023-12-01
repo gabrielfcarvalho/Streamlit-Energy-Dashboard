@@ -6,7 +6,7 @@ import plotly.express as px
 st.set_page_config(page_title="Análise Energética", page_icon="⚡", layout="wide", initial_sidebar_state="auto")
 
 # Função para carregar dados
-@st.cache
+@st.cache_data
 def load_data():
     return pd.read_excel("Dados.xlsx", sheet_name=None)
 
@@ -137,7 +137,7 @@ def display_suggested_energy_distribution(data, selected_month):
         st.write("Não há dados de consumo para exibir.")
 
 # Seletor de páginas na barra lateral
-page = st.sidebar.radio("#Escolha a página:", ("Métricas", "Gráficos", "Distribuição de Energia e Sugestão"))
+page = st.sidebar.radio("# Escolha a página:", ("Métricas", "Gráficos", "Distribuição de Energia e Sugestão"))
 
 # Exibindo a página selecionada
 if page == "Métricas":
