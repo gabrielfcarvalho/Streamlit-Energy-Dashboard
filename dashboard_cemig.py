@@ -111,11 +111,12 @@ def setup_metrics(data):
                     all_dates.append(date)
 
         # Seletores para escolher o período de referência com rótulos
-        start_period_index = st.selectbox('Data Inicial', range(len(all_dates)), format_func=lambda x: all_dates[x])
+        start_period = st.selectbox('Escolha o Período Inicial', all_dates, index=0)
         # Atualiza as opções para a data final com base na seleção inicial
-        end_period_index = st.selectbox('Data Final', range(start_period_index, len(all_dates)), format_func=lambda x: all_dates[x])
+        end_period_options = all_dates[all_dates.index(start_period):]
+        end_period = st.selectbox('Escolha o Período Final', end_period_options, index=0)
 
-        return all_dates[start_period_index], all_dates[end_period_index]
+        return start_period, end_period
 
 # Atualização da função para calcular a energia transferida
 def calculate_energy_transferred(data, loc, selected_month_index):
