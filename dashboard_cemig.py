@@ -2,23 +2,35 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-st.set_page_config(
-    page_title="Análise Energética",
-    page_icon="⚡",
-    layout="wide",
-    initial_sidebar_state="auto",
-)
+# Configuração inicial da página
+st.set_page_config(page_title="Análise Energética", page_icon="⚡", layout="wide", initial_sidebar_state="auto")
 
 # Função para carregar dados
-@st.cache_data
+@st.cache
 def load_data():
     return pd.read_excel("Dados.xlsx", sheet_name=None)
 
 # Carregar dados do Excel
 data = load_data()
 
-# Título do Dashboard
-st.title('Análise Energética')
+# Definição das funções para cada página
+def show_metrics_page():
+    st.title('Métricas de Energia')
+    total_consumo, total_geracao, periodo_formatado = calculate_metrics(data)
+    display_metrics(total_consumo, total_geracao, periodo_formatado)
+
+def show_charts_page():
+    st.title('Gráficos de Consumo e Geração de Energia')
+    tipo_dado, localidades_selecionadas, tipo_grafico = setup_sidebar(data)
+    titulo_grafico = f"{tipo_dado} nas propriedades {', '.join(localidades_selecionadas)}"
+    plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas)
+
+def show_distribution_page():
+    st.title('Distribuição de Energia e Sugestão')
+    selected_month = setup_sidebar(data)[3]
+    display_monthly_energy_distribution(data, selected_month)
+    with st.expander(f"Visualizar Sugestão de Distribuição Baseada no Consumo do mês {selected_month}"):
+        display_suggested_energy_distribution(data, selected_month)
 
 def calculate_metrics(data):
     total_consumo = sum(df['Consumo Total em kWh'].sum() for df in data.values())
@@ -33,10 +45,6 @@ def display_metrics(total_consumo, total_geracao, periodo_formatado):
     col1.metric("Período de Referência", periodo_formatado)
     col2.metric("Consumo Total de Energia (kWh)", "{:,.2f} kWh".format(total_consumo).replace(",", "X").replace(".", ",").replace("X", "."))
     col3.metric("Total de Energia Gerada (kWh)", "{:,.2f} kWh".format(total_geracao).replace(",", "X").replace(".", ",").replace("X", "."))
-
-# Cálculo e exibição de métricas
-total_consumo, total_geracao, periodo_formatado = calculate_metrics(data)
-display_metrics(total_consumo, total_geracao, periodo_formatado)
 
 # Função para gerar os gráficos
 def plot_chart(df, title, y_label, chart_type, localidades_selecionadas):
@@ -78,9 +86,6 @@ def setup_sidebar(data):
         selected_month = st.selectbox('Escolha o mês de referência:', meses_disponiveis)
     return tipo_dado, localidades_selecionadas, tipo_grafico, selected_month
 
-# Setup sidebar e captura de valores de filtro
-tipo_dado, localidades_selecionadas, tipo_grafico, selected_month = setup_sidebar(data)
-
 # Atualização da função para calcular a energia transferida
 def calculate_energy_transferred(data, loc, selected_month_index):
     loc_data = data[loc]
@@ -121,17 +126,4 @@ def display_suggested_energy_distribution(data, selected_month):
         st.plotly_chart(fig)
     else:
         st.write("Não há dados de consumo para exibir.")
-
-# Tabs para diferentes visualizações
-tab1, tab2 = st.tabs(["Gráficos", "Distribuição da Energia Gerada"])
-
-with tab1:
-    titulo_grafico = f"{tipo_dado} nas propriedades {', '.join(localidades_selecionadas)}"
-    plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas)    
-
-# Aba de visualização da distribuição da energia gerada
-with tab2:
-    display_monthly_energy_distribution(data, selected_month)
-    with st.expander(f"Visualizar Sugestão de Distribuição Baseada no Consumo do mês {selected_month}"):
-        display_suggested_energy_distribution(data, selected_month)
 
