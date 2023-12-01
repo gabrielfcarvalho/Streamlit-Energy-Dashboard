@@ -33,7 +33,7 @@ def show_distribution_page():
     with st.expander(f"Visualizar Sugestão de Distribuição Baseada no Consumo do mês {selected_month}"):
         display_suggested_energy_distribution(data, selected_month)
 
-def calculate_metrics(data, start_date, end_date):
+def calculate_metrics(data, start_period, end_period):
     total_consumo = sum(df[(df['Mês/Ano'] >= start_period) & (df['Mês/Ano'] <= end_period)]['Consumo Total em kWh'].sum() for df in data.values())
     total_geracao = data['Sapecado 1'][(data['Sapecado 1']['Mês/Ano'] >= start_period) & (data['Sapecado 1']['Mês/Ano'] <= end_period)]['Energia Gerada em kWh'].sum()
     periodo_formatado = f"{start_period} - {end_period}"
