@@ -38,16 +38,25 @@ def calculate_metrics(data, start_period, end_period):
     total_geracao = 0
 
     # Processando cada dataframe e somando os valores
-    for df in data.values():
+    for key, df in data.values():
         # Aplicando a filtragem
         filtered_df = df[df['Mês/Ano'].between(start_period, end_period)]
         total_consumo += filtered_df['Consumo Total em kWh'].sum()
+
+        # Imprimindo o dataframe filtrado para depuração
+        st.write(f"Filtered Data for {key}:")
+        st.dataframe(filtered_df)
 
     # Tratamento específico para a planilha 'Sapecado 1', se existir
     if 'Sapecado 1' in data:
         sapecado_df = data['Sapecado 1']
         filtered_sapecado = sapecado_df[sapecado_df['Mês/Ano'].between(start_period, end_period)]
         total_geracao = filtered_sapecado['Energia Gerada em kWh'].sum()
+
+                # Imprimindo o dataframe filtrado de 'Sapecado 1' para depuração
+        st.write("Filtered Data for Sapecado 1:")
+        st.dataframe(filtered_sapecado)
+
 
     # Formatação do período para exibição
     periodo_formatado = f"{start_period} - {end_period}"
