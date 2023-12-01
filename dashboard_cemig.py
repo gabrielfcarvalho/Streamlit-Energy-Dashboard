@@ -132,6 +132,6 @@ with tab1:
 # Aba de visualização da distribuição da energia gerada
 with tab2:
     display_monthly_energy_distribution(data, selected_month)
-    with st.expander("Visualizar Sugestão de Distribuição Baseada no Consumo"):
+    with st.expander(f"Visualizar Sugestão de Distribuição Baseada no Consumo do mês {selected_month}"):
         display_suggested_energy_distribution(data, selected_month)
 
