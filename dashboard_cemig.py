@@ -91,7 +91,8 @@ def setup_distribution_sidebar(data):
 
 # Função de configuração da barra lateral para métricas
 def setup_metrics():
-    st.title('Filtros para os Métricas')
+    with st.sidebar:
+        st.title('Filtros para os Métricas')
     pass
 
 # Atualização da função para calcular a energia transferida
