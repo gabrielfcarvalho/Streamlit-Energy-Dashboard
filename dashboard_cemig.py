@@ -141,10 +141,10 @@ with st.sidebar:
     st.title('***O que você gostaria de analisar?***:thinking_face:')
     page = st.radio("", ("Métricas:information_source:", "Gráficos:bar_chart:", "Distribuição de Energia e Sugestão:heavy_division_sign:"))
 
-# Exibindo a página selecionada
-if page == "Métricas":
-    show_metrics_page()
-elif page == "Gráficos":
-    show_charts_page()
-elif page == "Distribuição de Energia e Sugestão":
-    show_distribution_page()
+    # Exibindo a página selecionada
+    if page == "Métricas":
+        show_metrics_page()
+    elif page == "Gráficos":
+        show_charts_page()
+    elif page == "Distribuição de Energia e Sugestão":
+        show_distribution_page()
