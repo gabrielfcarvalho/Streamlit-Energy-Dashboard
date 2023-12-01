@@ -38,7 +38,7 @@ def calculate_metrics(data, start_period, end_period):
     total_geracao = 0
 
     # Processando cada dataframe e somando os valores
-    for key, df in data.values():
+    for key, df in data.items():
         # Aplicando a filtragem
         filtered_df = df[df['Mês/Ano'].between(start_period, end_period)]
         total_consumo += filtered_df['Consumo Total em kWh'].sum()
