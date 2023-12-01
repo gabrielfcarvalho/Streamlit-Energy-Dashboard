@@ -88,7 +88,7 @@ def setup_distribution_sidebar(data):
         return selected_month
 
 # Função de configuração da barra lateral para métricas
-def setup_metrics():
+def setup_metrics(data):
     with st.sidebar:
         st.title('Filtros para as Métricas')
         # Criar lista de meses/anos disponíveis
