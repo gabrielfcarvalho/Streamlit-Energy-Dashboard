@@ -49,7 +49,7 @@ def calculate_metrics(data, start_period, end_period):
 def display_metrics(total_consumo, total_geracao, periodo_formatado):
     col1, col2, col3 = st.columns(3)
     col1.metric("Período de Referência", periodo_formatado)
-    col2.metric("# Consumo Total de Energia (kWh)", "{:,.2f} kWh".format(total_consumo).replace(",", "X").replace(".", ",").replace("X", "."))
+    col2.metric("Consumo Total de Energia (kWh)", "{:,.2f} kWh".format(total_consumo).replace(",", "X").replace(".", ",").replace("X", "."))
     col3.metric("Total de Energia Gerada (kWh)", "{:,.2f} kWh".format(total_geracao).replace(",", "X").replace(".", ",").replace("X", "."))
 
 # Função para gerar os gráficos
@@ -154,7 +154,7 @@ def display_suggested_energy_distribution(data, selected_month):
 # Seletor de páginas na barra lateral
 with st.sidebar:
     st.title('***O que você gostaria de analisar?***:thinking_face:')
-    page = st.radio("", ("Métricas :information_source:", "Gráficos :bar_chart:", "Distribuição de Energia :battery:"))
+    page = st.radio("---", ("Métricas :information_source:", "Gráficos :bar_chart:", "Distribuição de Energia :battery:"))
 
 # Exibindo a página selecionada
 if page == "Métricas :information_source:":
