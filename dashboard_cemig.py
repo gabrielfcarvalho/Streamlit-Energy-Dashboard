@@ -34,11 +34,9 @@ def show_distribution_page():
         display_suggested_energy_distribution(data, selected_month)
 
 def calculate_metrics(data):
-    total_consumo = sum(df['Consumo Total em kWh'].sum() for df in data.values())
-    total_geracao = data['Sapecado 1']['Energia Gerada em kWh'].sum()
-    periodo_inicial = data[next(iter(data))]['Mês/Ano'].iloc[0]
-    periodo_final = data[next(iter(data))]['Mês/Ano'].iloc[-1]
-    periodo_formatado = f"{periodo_inicial} - {periodo_final}"
+    total_consumo = sum(df[(df['Mês/Ano'] >= start_period) & (df['Mês/Ano'] <= end_period)]['Consumo Total em kWh'].sum() for df in data.values())
+    total_geracao = data['Sapecado 1'][(data['Sapecado 1']['Mês/Ano'] >= start_period) & (data['Sapecado 1']['Mês/Ano'] <= end_period)]['Energia Gerada em kWh'].sum()
+    periodo_formatado = f"{start_period} - {end_period}"
     return total_consumo, total_geracao, periodo_formatado
 
 def display_metrics(total_consumo, total_geracao, periodo_formatado):
@@ -93,7 +91,12 @@ def setup_distribution_sidebar(data):
 def setup_metrics():
     with st.sidebar:
         st.title('Filtros para as Métricas')
-    pass
+        # Criar lista de meses/anos disponíveis
+        all_dates = sorted(set(date for df in data.values() for date in df['Mês/Ano']))
+        # Seletores para escolher o período de referência
+        start_period = st.selectbox('Período Inicial', all_dates, index=0)
+        end_period = st.selectbox('Período Final', all_dates, index=len(all_dates) - 1)
+        return start_period, end_period
 
 # Atualização da função para calcular a energia transferida
 def calculate_energy_transferred(data, loc, selected_month_index):
