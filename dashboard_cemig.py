@@ -97,7 +97,7 @@ def display_monthly_energy_distribution(data, selected_month):
     st.write(f"## Distribuição de Energia Transferida para o Mês: {selected_month}")
 
     selected_month_index = data[next(iter(data))]['Mês/Ano'].tolist().index(selected_month)
-    transferred_data = [{'Localidade': loc, 'Transferida': calculate_energy_transferred(data, loc, selected_month_index)} for loc in data.keys()]
+    transferred_data = [{'Localidade': loc, 'Energia Transferida': calculate_energy_transferred(data, loc, selected_month_index)} for loc in data.keys()]
 
     if transferred_data:
         df_transferred = pd.DataFrame(transferred_data)
