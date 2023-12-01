@@ -83,14 +83,17 @@ tipo_dado, localidades_selecionadas, tipo_grafico, selected_month = setup_sideba
 
 def calculate_energy_injected(data, loc, selected_month):
     loc_data = data[loc][data[loc]['Mês/Ano'] == selected_month]
-    prev_month_data = data[loc][data[loc]['Mês/Ano'] == selected_month - pd.DateOffset(months=1)]
+    
+    if not loc_data.empty and 'Energia Injetada em kWh' in loc_data.columns and 'Saldo Atual de Geração' in loc_data.columns:
+        # Calculando a diferença de saldo em relação ao mês anterior
+        loc_data['Saldo Anterior'] = loc_data['Saldo Atual de Geração'].shift(1)
+        loc_data['Variação Saldo'] = loc_data['Saldo Atual de Geração'] - loc_data['Saldo Anterior']
 
-    injected = loc_data['Energia Injetada em kWh'].sum() if 'Energia Injetada em kWh' in loc_data.columns else 0
-    current_saldo = loc_data['Saldo Atual de Geração'].sum() if 'Saldo Atual de Geração' in loc_data.columns else 0
-    prev_saldo = prev_month_data['Saldo Atual de Geração'].sum() if 'Saldo Atual de Geração' in prev_month_data.columns else 0
-
-    saldo_diff = current_saldo - prev_saldo
-    return injected + saldo_diff
+        # Ajustando a energia injetada
+        injected = loc_data.iloc[0]['Energia Injetada em kWh']
+        saldo_var = loc_data.iloc[0]['Variação Saldo'] if pd.notna(loc_data.iloc[0]['Variação Saldo']) else 0
+        return injected + saldo_var
+    return 0
 
 def display_monthly_energy_distribution(data, selected_month):
     st.write(f"## Distribuição de Energia Injetada para o Mês: {selected_month}")
