@@ -66,7 +66,7 @@ def setup_sidebar(data):
     with st.sidebar:
         st.title('Filtros para os Gráficos')
         tipo_dado = st.selectbox('Selecione o que você gostaria de saber:', ['Consumo Total em kWh', 'Energia Injetada em kWh', 'Energia Gerada em kWh', 
-            'Saldo Atual de Geração', 'Consumo Pago em kWh'])
+            'Saldo Atual de Geração em kWh', 'Consumo Pago em kWh'])
         opcoes_localidades = list(data.keys())
         localidades_selecionadas = st.multiselect("Selecione as propriedades que deseja obter as informações:",
                                                   options=opcoes_localidades,
@@ -83,15 +83,16 @@ tipo_dado, localidades_selecionadas, tipo_grafico, selected_month = setup_sideba
 
 def calculate_energy_injected(data, loc, selected_month_index):
     loc_data = data[loc]
-    if selected_month_index == 0:  # Se for a primeira linha, não há mês anterior para comparar
-        return 0
+    if selected_month_index == 0:  # Primeira linha: considera apenas a energia injetada
+        injected = loc_data.iloc[0]['Energia Injetada em kWh'] if 'Energia Injetada em kWh' in loc_data.columns else 0
+        return injected
 
     current_month_data = loc_data.iloc[selected_month_index]
     previous_month_data = loc_data.iloc[selected_month_index - 1]
 
     injected = current_month_data['Energia Injetada em kWh'] if 'Energia Injetada em kWh' in current_month_data else 0
-    current_saldo = current_month_data['Saldo Atual de Geração'] if 'Saldo Atual de Geração' in current_month_data else 0
-    prev_saldo = previous_month_data['Saldo Atual de Geração'] if 'Saldo Atual de Geração' in previous_month_data else 0
+    current_saldo = current_month_data['Saldo Atual de Geração em kWh'] if 'Saldo Atual de Geração em kWh' in current_month_data else 0
+    prev_saldo = previous_month_data['Saldo Atual de Geração em kWh'] if 'Saldo Atual de Geração em kWh' in previous_month_data else 0
 
     saldo_diff = current_saldo - prev_saldo
     return max(0, injected + saldo_diff)
