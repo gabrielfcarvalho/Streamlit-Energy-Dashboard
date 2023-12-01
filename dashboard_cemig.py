@@ -49,7 +49,7 @@ def calculate_metrics(data, start_period, end_period):
 def display_metrics(total_consumo, total_geracao, periodo_formatado):
     col1, col2, col3 = st.columns(3)
     col1.metric("Período de Referência", periodo_formatado)
-    col2.metric("Consumo Total de Energia (kWh)", "{:,.2f} kWh".format(total_consumo).replace(",", "X").replace(".", ",").replace("X", "."))
+    col2.metric("# Consumo Total de Energia (kWh)", "{:,.2f} kWh".format(total_consumo).replace(",", "X").replace(".", ",").replace("X", "."))
     col3.metric("Total de Energia Gerada (kWh)", "{:,.2f} kWh".format(total_geracao).replace(",", "X").replace(".", ",").replace("X", "."))
 
 # Função para gerar os gráficos
@@ -106,8 +106,8 @@ def setup_metrics(data):
                 if date not in all_dates:
                     all_dates.append(date)
         # Seletores para escolher o período de referência
-        start_period = st.selectbox('Período Inicial', all_dates, index=0)
-        end_period = st.selectbox('Período Final', all_dates, index=len(all_dates) - 1)
+        start_period = st.selectbox('Data Inicial', all_dates, index=0)
+        end_period = st.selectbox('Data Final', all_dates, index=len(all_dates) - 1)
         return start_period, end_period
 
 # Atualização da função para calcular a energia transferida
