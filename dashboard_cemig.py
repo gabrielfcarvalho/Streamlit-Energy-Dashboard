@@ -92,7 +92,7 @@ def setup_distribution_sidebar(data):
 # Função de configuração da barra lateral para métricas
 def setup_metrics():
     with st.sidebar:
-        st.title('Filtros para os Métricas')
+        st.title('Filtros para as Métricas')
     pass
 
 # Atualização da função para calcular a energia transferida
@@ -137,7 +137,7 @@ def display_suggested_energy_distribution(data, selected_month):
         st.write("Não há dados de consumo para exibir.")
 
 # Seletor de páginas na barra lateral
-page = st.sidebar.radio("Escolha a página:", ("Métricas", "Gráficos", "Distribuição de Energia e Sugestão"))
+page = st.sidebar.radio("#Escolha a página:", ("Métricas", "Gráficos", "Distribuição de Energia e Sugestão"))
 
 # Exibindo a página selecionada
 if page == "Métricas":
