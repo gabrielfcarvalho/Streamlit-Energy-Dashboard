@@ -108,8 +108,6 @@ def display_monthly_energy_distribution(data, selected_month):
 
 def display_suggested_energy_distribution(data, selected_month):
 
-    total_consumption = sum(df[df['Mês/Ano'] == selected_month]['Consumo Total em kWh'].sum() for df in data.values())
-
     consumption_data = []
     for loc in data.keys():
         loc_data = data[loc][data[loc]['Mês/Ano'] == selected_month]
