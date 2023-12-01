@@ -142,9 +142,9 @@ with st.sidebar:
     page = st.radio("", ("Métricas      :information_source:", "Gráficos      :bar_chart:", "Distribuição de Energia e Sugestão      :heavy_division_sign:"))
 
     # Exibindo a página selecionada
-    if page == "Métricas":
+    if page == "Métricas      :information_source:":
         show_metrics_page()
-    elif page == "Gráficos":
+    elif page == "Gráficos      :bar_chart:":
         show_charts_page()
-    elif page == "Distribuição de Energia e Sugestão":
+    elif page == "Distribuição de Energia e Sugestão      :heavy_division_sign:":
         show_distribution_page()
