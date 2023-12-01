@@ -81,21 +81,22 @@ def setup_sidebar(data):
 # Setup sidebar e captura de valores de filtro
 tipo_dado, localidades_selecionadas, tipo_grafico, selected_month = setup_sidebar(data)
 
+def calculate_energy_injected(data, loc, selected_month):
+    loc_data = data[loc][data[loc]['Mês/Ano'] == selected_month]
+    prev_month_data = data[loc][data[loc]['Mês/Ano'] == selected_month - pd.DateOffset(months=1)]
+
+    injected = loc_data['Energia Injetada em kWh'].sum() if 'Energia Injetada em kWh' in loc_data.columns else 0
+    current_saldo = loc_data['Saldo Atual de Geração'].sum() if 'Saldo Atual de Geração' in loc_data.columns else 0
+    prev_saldo = prev_month_data['Saldo Atual de Geração'].sum() if 'Saldo Atual de Geração' in prev_month_data.columns else 0
+
+    saldo_diff = current_saldo - prev_saldo
+    return injected + saldo_diff
+
 def display_monthly_energy_distribution(data, selected_month):
     st.write(f"## Distribuição de Energia Injetada para o Mês: {selected_month}")
 
-    # Calculando a energia injetada total
-    total_injected = sum(df[df['Mês/Ano'] == selected_month]['Energia Injetada em kWh'].sum() for df in data.values())
+    injected_data = [{'Localidade': loc, 'Energia Injetada': calculate_energy_injected(data, loc, selected_month)} for loc in data.keys()]
 
-    # Coletando dados de energia injetada por localidade
-    injected_data = []
-    for loc in data.keys():
-        loc_data = data[loc][data[loc]['Mês/Ano'] == selected_month]
-        if not loc_data.empty and 'Energia Injetada em kWh' in loc_data.columns:
-            injected = loc_data['Energia Injetada em kWh'].sum()
-            injected_data.append({'Localidade': loc, 'Energia Injetada': injected})
-
-    # Criando o gráfico de pizza
     if injected_data:
         df_injected = pd.DataFrame(injected_data)
         fig = px.pie(df_injected, values='Energia Injetada', names='Localidade', title="Distribuição de Energia Injetada")
