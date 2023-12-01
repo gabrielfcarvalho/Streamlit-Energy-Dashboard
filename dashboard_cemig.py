@@ -37,17 +37,19 @@ def calculate_metrics(data, start_period, end_period):
     total_consumo = 0
     total_geracao = 0
 
+    # Processando cada dataframe e somando os valores
     for df in data.values():
-        # Filtra os dados com base no período selecionado
+        # Aplicando a filtragem
         filtered_df = df[df['Mês/Ano'].between(start_period, end_period)]
         total_consumo += filtered_df['Consumo Total em kWh'].sum()
 
-    # Filtragem específica para a planilha 'Sapecado 1'
+    # Tratamento específico para a planilha 'Sapecado 1', se existir
     if 'Sapecado 1' in data:
         sapecado_df = data['Sapecado 1']
         filtered_sapecado = sapecado_df[sapecado_df['Mês/Ano'].between(start_period, end_period)]
         total_geracao = filtered_sapecado['Energia Gerada em kWh'].sum()
 
+    # Formatação do período para exibição
     periodo_formatado = f"{start_period} - {end_period}"
     return total_consumo, total_geracao, periodo_formatado
 
@@ -111,10 +113,10 @@ def setup_metrics(data):
                     all_dates.append(date)
 
         # Seletores para escolher o período de referência com rótulos
-        start_period = st.selectbox('Escolha o Período Inicial', all_dates, index=0)
+        start_period = st.selectbox('Data Inicial', all_dates, index=0)
         # Atualiza as opções para a data final com base na seleção inicial
         end_period_options = all_dates[all_dates.index(start_period):]
-        end_period = st.selectbox('Escolha o Período Final', end_period_options, index=0)
+        end_period = st.selectbox('Data Final', end_period_options, index=0)
 
         return start_period, end_period
 
