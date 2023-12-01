@@ -49,23 +49,16 @@ def calculate_metrics(data, start_period, end_period):
     end_index = all_dates.index(end_period)
 
     # Processamento de cada dataframe
-    for key, df in data.items():
+    for df in data.values():
         # Filtragem com base nos índices
         filtered_df = df[df['Mês/Ano'].isin(all_dates[start_index:end_index + 1])]
         total_consumo += filtered_df['Consumo Total em kWh'].sum()
-
-        # Imprimindo o dataframe filtrado para depuração
-        st.write(f"Filtered Data for {key}:")
-        st.dataframe(filtered_df)
 
     # Tratamento específico para 'Sapecado 1'
     if 'Sapecado 1' in data:
         sapecado_df = data['Sapecado 1']
         filtered_sapecado = sapecado_df[sapecado_df['Mês/Ano'].isin(all_dates[start_index:end_index + 1])]
         total_geracao = filtered_sapecado['Energia Gerada em kWh'].sum()
-
-        st.write("Filtered Data for Sapecado 1:")
-        st.dataframe(filtered_sapecado)
 
     periodo_formatado = f"{start_period} - {end_period}"
     return total_consumo, total_geracao, periodo_formatado
