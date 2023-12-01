@@ -82,24 +82,23 @@ def setup_sidebar(data):
 tipo_dado, localidades_selecionadas, tipo_grafico, selected_month = setup_sidebar(data)
 
 def display_monthly_energy_distribution(data, selected_month):
-    st.write(f"## Distribuição de Energia para o Mês: {selected_month}")
+    st.write(f"## Distribuição de Energia Injetada para o Mês: {selected_month}")
 
-    total_generated = data['Sapecado 1']['Energia Gerada em kWh'].sum()
-    distribuicao_energia = {}
+    # Calculando a energia injetada total
+    total_injected = sum(df[df['Mês/Ano'] == selected_month]['Energia Injetada em kWh'].sum() for df in data.values())
 
+    # Coletando dados de energia injetada por localidade
+    injected_data = []
     for loc in data.keys():
         loc_data = data[loc][data[loc]['Mês/Ano'] == selected_month]
-        if loc_data.empty or 'Energia Injetada em kWh' not in loc_data.columns:
-            continue
+        if not loc_data.empty and 'Energia Injetada em kWh' in loc_data.columns:
+            injected = loc_data['Energia Injetada em kWh'].sum()
+            injected_data.append({'Localidade': loc, 'Energia Injetada': injected})
 
-        injected = loc_data['Energia Injetada em kWh'].sum()
-        current_saldo = loc_data['Saldo Atual de Geração'].sum() if 'Saldo Atual de Geração' in loc_data.columns else 0
-        distribuicao_energia[loc] = injected + current_saldo
-
-    if distribuicao_energia:
-        df_distribuicao = pd.DataFrame(list(distribuicao_energia.items()), columns=['Localidade', 'Energia Injetada'])
-        df_distribuicao['Porcentagem Injetada'] = (df_distribuicao['Energia Injetada'] / total_generated) * 100
-        fig = px.pie(df_distribuicao, values='Porcentagem Injetada', names='Localidade', title="Distribuição de Energia Injetada")
+    # Criando o gráfico de pizza
+    if injected_data:
+        df_injected = pd.DataFrame(injected_data)
+        fig = px.pie(df_injected, values='Energia Injetada', names='Localidade', title="Distribuição de Energia Injetada")
         st.plotly_chart(fig)
     else:
         st.write("Não há dados de energia injetada para exibir.")
