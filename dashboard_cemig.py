@@ -81,29 +81,26 @@ def setup_sidebar(data):
 # Setup sidebar e captura de valores de filtro
 tipo_dado, localidades_selecionadas, tipo_grafico, selected_month = setup_sidebar(data)
 
-def calculate_energy_injected(data, loc, selected_month):
-    loc_data = data[loc][data[loc]['Mês/Ano'] == selected_month]
-    
-    if not loc_data.empty:
-        if 'Energia Injetada em kWh' in loc_data.columns:
-            injected = loc_data['Energia Injetada em kWh'].sum()
-        else:
-            injected = 0
+def calculate_energy_injected(data, loc, selected_month_index):
+    loc_data = data[loc]
+    if selected_month_index == 0:  # Se for a primeira linha, não há mês anterior para comparar
+        return 0
 
-        if 'Saldo Atual de Geração' in loc_data.columns:
-            loc_data['Saldo Anterior'] = loc_data['Saldo Atual de Geração'].shift(1)
-            loc_data['Variação Saldo'] = loc_data.apply(lambda row: row['Saldo Atual de Geração'] - row['Saldo Anterior'] if pd.notnull(row['Saldo Anterior']) else 0, axis=1)
-            saldo_var = loc_data['Variação Saldo'].sum()
-        else:
-            saldo_var = 0
+    current_month_data = loc_data.iloc[selected_month_index]
+    previous_month_data = loc_data.iloc[selected_month_index - 1]
 
-        return injected + saldo_var
-    return 0
+    injected = current_month_data['Energia Injetada em kWh'] if 'Energia Injetada em kWh' in current_month_data else 0
+    current_saldo = current_month_data['Saldo Atual de Geração'] if 'Saldo Atual de Geração' in current_month_data else 0
+    prev_saldo = previous_month_data['Saldo Atual de Geração'] if 'Saldo Atual de Geração' in previous_month_data else 0
+
+    saldo_diff = current_saldo - prev_saldo
+    return max(0, injected + saldo_diff)
 
 def display_monthly_energy_distribution(data, selected_month):
     st.write(f"## Distribuição de Energia Injetada para o Mês: {selected_month}")
 
-    injected_data = [{'Localidade': loc, 'Energia Injetada': calculate_energy_injected(data, loc, selected_month)} for loc in data.keys()]
+    selected_month_index = data[next(iter(data))]['Mês/Ano'].tolist().index(selected_month)
+    injected_data = [{'Localidade': loc, 'Energia Injetada': calculate_energy_injected(data, loc, selected_month_index)} for loc in data.keys()]
 
     if injected_data:
         df_injected = pd.DataFrame(injected_data)
