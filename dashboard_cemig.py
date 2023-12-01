@@ -137,7 +137,7 @@ def display_suggested_energy_distribution(data, selected_month):
         st.write("Não há dados de consumo para exibir.")
 
 # Seletor de páginas na barra lateral
-page = st.sidebar.radio("<font size=”10”> ***O que você gostaria de analisar?***:thinking_face:</font>", ("Métricas", "Gráficos", "Distribuição de Energia e Sugestão"))
+page = st.sidebar.radio(f"***O que você gostaria de analisar?***:thinking_face:", ("Métricas", "Gráficos", "Distribuição de Energia e Sugestão"))
 
 # Exibindo a página selecionada
 if page == "Métricas":
