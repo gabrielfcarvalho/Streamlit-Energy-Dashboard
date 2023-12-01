@@ -6,7 +6,7 @@ import plotly.express as px
 st.set_page_config(page_title="Análise Energética", page_icon="⚡", layout="wide", initial_sidebar_state="auto")
 
 # Função para carregar dados
-@st.cache_data
+@st.cache
 def load_data():
     return pd.read_excel("Dados.xlsx", sheet_name=None)
 
@@ -16,18 +16,19 @@ data = load_data()
 # Definição das funções para cada página
 def show_metrics_page():
     st.title('Métricas de Energia')
+    setup_metrics()
     total_consumo, total_geracao, periodo_formatado = calculate_metrics(data)
     display_metrics(total_consumo, total_geracao, periodo_formatado)
 
 def show_charts_page():
     st.title('Gráficos de Consumo e Geração de Energia')
-    tipo_dado, localidades_selecionadas, tipo_grafico = setup_sidebar(data)
+    tipo_dado, localidades_selecionadas, tipo_grafico = setup_charts_sidebar(data)
     titulo_grafico = f"{tipo_dado} nas propriedades {', '.join(localidades_selecionadas)}"
     plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas)
 
 def show_distribution_page():
     st.title('Distribuição de Energia e Sugestão')
-    selected_month = setup_sidebar(data)[3]
+    selected_month = setup_distribution_sidebar(data)
     display_monthly_energy_distribution(data, selected_month)
     with st.expander(f"Visualizar Sugestão de Distribuição Baseada no Consumo do mês {selected_month}"):
         display_suggested_energy_distribution(data, selected_month)
@@ -70,21 +71,28 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas):
     else:
         st.error("Não foram selecionadas propriedades para exibir.")
 
-def setup_sidebar(data):
+# Função de configuração da barra lateral para gráficos
+def setup_charts_sidebar(data):
     with st.sidebar:
         st.title('Filtros para os Gráficos')
-        tipo_dado = st.selectbox('Selecione o que você gostaria de saber:', ['Consumo Total em kWh', 'Energia Compensada em kWh', 'Energia Transferida em kWh', 'Energia Gerada em kWh', 
-            'Saldo Atual de Geração em kWh', 'Consumo Pago em kWh'])
+        tipo_dado = st.selectbox('Selecione o que você gostaria de saber:', ['Consumo Total em kWh', 'Energia Compensada em kWh', 'Energia Transferida em kWh', 'Energia Gerada em kWh', 'Saldo Atual de Geração em kWh', 'Consumo Pago em kWh'])
         opcoes_localidades = list(data.keys())
-        localidades_selecionadas = st.multiselect("Selecione as propriedades que deseja obter as informações:",
-                                                  options=opcoes_localidades,
-                                                  default=opcoes_localidades[0])
+        localidades_selecionadas = st.multiselect("Selecione as propriedades que deseja obter as informações:", options=opcoes_localidades, default=opcoes_localidades[0])
         tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra'))
-        st.write("---")
+        return tipo_dado, localidades_selecionadas, tipo_grafico
+
+# Função de configuração da barra lateral para distribuição de energia
+def setup_distribution_sidebar(data):
+    with st.sidebar:
         st.title('Filtro para a Distribuição da Energia Gerada')
         meses_disponiveis = data['Sapecado 1']['Mês/Ano'].unique()
         selected_month = st.selectbox('Escolha o mês de referência:', meses_disponiveis)
-    return tipo_dado, localidades_selecionadas, tipo_grafico, selected_month
+        return selected_month
+
+# Função de configuração da barra lateral para métricas
+def setup_metrics():
+    st.title('Filtros para os Métricas')
+    pass
 
 # Atualização da função para calcular a energia transferida
 def calculate_energy_transferred(data, loc, selected_month_index):
