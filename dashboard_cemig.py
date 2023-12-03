@@ -50,11 +50,12 @@ def show_metrics_page():
         with col2:
             st.metric("Total de Energia Transferida (kWh)", f"{metrics['Energia Transferida Total']:.2f} kWh")
 
-    st.markdown("<hr>", unsafe_allow_html=True)
 
     # Expander para Saldo Atual de Geração
     with st.expander("Saldo Atual de Geração Total", expanded=False):
         st.metric("Saldo Atual de Geração Total (kWh)", f"{metrics['Saldo Atual de Geração']:.2f} kWh")
+
+    st.markdown("<hr>", unsafe_allow_html=True)
 
     # Seção de Análise de Compensação Energética
     with st.container():
