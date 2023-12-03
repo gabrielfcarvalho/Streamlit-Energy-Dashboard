@@ -15,7 +15,7 @@ def load_data():
 # Carregar dados do Excel
 data = load_data()
 
-# Função para exibir a página de métricas
+# Função para exibir a página de métricas com um layout melhorado
 def show_metrics_page():
     st.title('Métricas')
 
@@ -23,25 +23,29 @@ def show_metrics_page():
     start_period, end_period = setup_metrics(data)
     metrics = calculate_metrics(data, start_period, end_period)
 
-    # Exibir o período de referência centralizado
-    st.write(f"### Período de Referência: {metrics['Periodo']}")
+    # Período de Referência
+    st.markdown(f"### Período de Referência: {metrics['Periodo']}")
+    st.markdown("<hr>", unsafe_allow_html=True)
 
-    # Organizando métricas em colunas abaixo do período de referência
-    col1, col2, col3 = st.columns(3)
+    # Uso de containers ou expanders para agrupar métricas
+    energy_metrics = st.container()
+    cost_metrics = st.expander("Detalhes dos Custos", expanded=False)
 
-    with col1:
-        st.metric("Consumo Total de Energia (kWh)", f"{metrics['Consumo Total']:.2f} kWh")
-        st.metric("Total de Energia Gerada (kWh)", f"{metrics['Geração Total']:.2f} kWh")
-        st.metric("Média Diária de Consumo (kWh)", f"{metrics['Média Diária de Consumo']:.2f} kWh/dia")
+    with energy_metrics:
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Consumo Total (kWh)", f"{metrics['Consumo Total']:.2f}")
+        with col2:
+            st.metric("Geração Total (kWh)", f"{metrics['Geração Total']:.2f}")
+        with col3:
+            st.metric("Média Diária (kWh)", f"{metrics['Média Diária de Consumo']:.2f}")
 
-    with col2:
-        st.metric("Custo Total de Energia (R$)", f"R$ {metrics['Custo Total']:.2f}")
-        st.metric("Total de Energia Compensada (kWh)", f"{metrics['Energia Compensada Total']:.2f} kWh")
-        st.metric("Saldo Atual de Geração (kWh)", f"{metrics['Saldo Atual de Geração']:.2f} kWh")
+    with cost_metrics:
+        st.metric("Custo Total (R$)", f"R$ {metrics['Custo Total']:.2f}")
+        st.metric("Energia Compensada (kWh)", f"{metrics['Energia Compensada Total']:.2f}")
+        st.metric("Energia Transferida (kWh)", f"{metrics['Energia Transferida Total']:.2f}")
 
-    with col3:
-        st.metric("Total de Energia Transferida (kWh)", f"{metrics['Energia Transferida Total']:.2f} kWh")
-        st.metric("Consumo Pago Total (kWh)", f"{metrics['Consumo Pago Total']:.2f} kWh")
+    st.markdown("<hr>", unsafe_allow_html=True)
 
 def show_charts_page():
     st.title('Gráficos')
