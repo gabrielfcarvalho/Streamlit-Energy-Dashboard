@@ -15,12 +15,21 @@ def load_data():
 # Carregar dados do Excel
 data = load_data()
 
-# Definição das funções para cada página
+# Função para exibir a página de métricas
 def show_metrics_page():
     st.title('Métricas')
-    start_date, end_date = setup_metrics(data)
-    total_consumo, total_geracao, periodo_formatado = calculate_metrics(data, start_date, end_date)
-    display_metrics(total_consumo, total_geracao, periodo_formatado)
+    start_period, end_period = setup_metrics(data)
+    metrics = calculate_metrics(data, start_period, end_period)
+
+    st.metric("Período de Referência", metrics["Periodo"])
+    st.metric("Consumo Total de Energia (kWh)", f"{metrics['Consumo Total']:.2f} kWh")
+    st.metric("Total de Energia Gerada (kWh)", f"{metrics['Geração Total']:.2f} kWh")
+    st.metric("Custo Total de Energia (R$)", f"R$ {metrics['Custo Total']:.2f}")
+    st.metric("Total de Energia Compensada (kWh)", f"{metrics['Energia Compensada Total']:.2f} kWh")
+    st.metric("Total de Energia Transferida (kWh)", f"{metrics['Energia Transferida Total']:.2f} kWh")
+    st.metric("Saldo Atual de Geração (kWh)", f"{metrics['Saldo Atual de Geração']:.2f} kWh")
+    st.metric("Consumo Pago Total (kWh)", f"{metrics['Consumo Pago Total']:.2f} kWh")
+    st.metric("Média Diária de Consumo (kWh)", f"{metrics['Média Diária de Consumo']:.2f} kWh/dia")
 
 def show_charts_page():
     st.title('Gráficos')
@@ -38,6 +47,11 @@ def show_distribution_page():
 def calculate_metrics(data, start_period, end_period):
     total_consumo = 0
     total_geracao = 0
+    total_custo = 0
+    total_energia_compensada = 0
+    total_energia_transferida = 0
+    saldo_atual_geracao = 0
+    consumo_pago_total = 0
 
     # Criar lista de meses/anos mantendo a ordem original
     all_dates = []
@@ -49,12 +63,16 @@ def calculate_metrics(data, start_period, end_period):
     # Obtendo os índices das datas inicial e final na lista ordenada
     start_index = all_dates.index(start_period)
     end_index = all_dates.index(end_period)
-
-    # Processamento de cada dataframe
+ 
+    # Processando cada dataframe e somando os valores
     for df in data.values():
-        # Filtragem com base nos índices
         filtered_df = df[df['Mês/Ano'].isin(all_dates[start_index:end_index + 1])]
         total_consumo += filtered_df['Consumo Total em kWh'].sum()
+        total_custo += filtered_df['Valor a Pagar (R$)'].sum()
+        total_energia_compensada += filtered_df['Energia Compensada em kWh'].sum()
+        total_energia_transferida += filtered_df['Energia Transferida em kWh'].sum()
+        saldo_atual_geracao += filtered_df['Saldo Atual de Geração em kWh'].iloc[-1]  # Assumindo que o saldo mais recente é relevante
+        consumo_pago_total += filtered_df['Consumo Pago em kWh'].sum()
 
     # Tratamento específico para 'Sapecado 1'
     if 'Sapecado 1' in data:
@@ -62,8 +80,22 @@ def calculate_metrics(data, start_period, end_period):
         filtered_sapecado = sapecado_df[sapecado_df['Mês/Ano'].isin(all_dates[start_index:end_index + 1])]
         total_geracao = filtered_sapecado['Energia Gerada em kWh'].sum()
 
+    # Calculando a média diária de consumo
+    dias_totais = sum(filtered_df['Dias Considerados'].sum() for df in data.values())
+    media_diaria_consumo = total_consumo / dias_totais if dias_totais > 0 else 0
+
     periodo_formatado = f"{start_period} - {end_period}"
-    return total_consumo, total_geracao, periodo_formatado
+    return {
+        "Periodo": periodo_formatado,
+        "Consumo Total": total_consumo,
+        "Geração Total": total_geracao,
+        "Custo Total": total_custo,
+        "Energia Compensada Total": total_energia_compensada,
+        "Energia Transferida Total": total_energia_transferida,
+        "Saldo Atual de Geração": saldo_atual_geracao,
+        "Consumo Pago Total": consumo_pago_total,
+        "Média Diária de Consumo": media_diaria_consumo
+    }
 
 def display_metrics(total_consumo, total_geracao, periodo_formatado):
     col1, col2, col3 = st.columns(3)
