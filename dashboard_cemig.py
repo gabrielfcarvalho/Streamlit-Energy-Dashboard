@@ -52,6 +52,16 @@ def show_metrics_page():
 
     st.markdown("<hr>", unsafe_allow_html=True)
 
+    # Exibindo métricas avançadas
+    with st.container():
+        st.write("### Análise Avançada de Energia")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Eficiência de Consumo", f"{metrics['Eficiência de Consumo']:.2f}")
+            st.metric("Custo Médio por kWh", f"R$ {metrics['Custo Médio por kWh']:.2f}")
+        with col2:
+            st.metric("Porcentagem de Energia Compensada", f"{metrics['Porcentagem de Energia Compensada']:.2f}%")
+
 
 def show_charts_page():
     st.title('Gráficos')
@@ -107,6 +117,11 @@ def calculate_metrics(data, start_period, end_period):
     media_diaria_consumo = total_consumo / dias_totais if dias_totais > 0 else 0
 
     periodo_formatado = f"{start_period} - {end_period}"
+    dias_totais = sum(filtered_df['Dias Considerados'].sum() for df in data.values())
+    eficiencia_consumo = total_consumo / dias_totais if dias_totais > 0 else 0
+    pct_energia_compensada = (total_energia_compensada / total_consumo) * 100 if total_consumo > 0 else 0
+    custo_medio_por_kwh = total_custo / total_consumo if total_consumo > 0 else 0
+
     return {
         "Periodo": periodo_formatado,
         "Consumo Total": total_consumo,
@@ -116,8 +131,12 @@ def calculate_metrics(data, start_period, end_period):
         "Energia Transferida Total": total_energia_transferida,
         "Saldo Atual de Geração": saldo_atual_geracao,
         "Consumo Pago Total": consumo_pago_total,
-        "Média Diária de Consumo": media_diaria_consumo
+        "Média Diária de Consumo": media_diaria_consumo,
+        "Eficiência de Consumo": eficiencia_consumo,
+        "Porcentagem de Energia Compensada": pct_energia_compensada,
+        "Custo Médio por kWh": custo_medio_por_kwh
     }
+
 
 def display_metrics(total_consumo, total_geracao, periodo_formatado):
     col1, col2, col3 = st.columns(3)
