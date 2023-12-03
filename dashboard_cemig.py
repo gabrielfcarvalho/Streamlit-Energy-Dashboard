@@ -25,7 +25,6 @@ def show_metrics_page():
 
     # Período de Referência
     st.markdown(f"### Período de Referência: {metrics['Periodo']}")
-    st.markdown("<hr>", unsafe_allow_html=True)
 
     # Métricas de Consumo e Geração
     col1, col2 = st.columns(2)
