@@ -44,8 +44,6 @@ def show_metrics_page():
         with col2:
             st.metric("Consumo Pago (kWh)", f"{metrics['Consumo Pago Total']:.2f} kWh")
 
-    st.markdown("<hr>", unsafe_allow_html=True)
-
     # Energia Compensada e Transferida
     with st.expander("Energia Compensada e Transferida", expanded=False):
         col1, col2 = st.columns(2)
@@ -54,13 +52,9 @@ def show_metrics_page():
         with col2:
             st.metric("Total de Energia Transferida (kWh)", f"{metrics['Energia Transferida Total']:.2f} kWh")
 
-    st.markdown("<hr>", unsafe_allow_html=True)
-
     # Expander para Saldo Atual de Geração
     with st.expander("Saldo Atual de Geração Total", expanded=False):
         st.metric("Saldo Atual de Geração Total (kWh)", f"{metrics['Saldo Atual de Geração']:.2f} kWh")
-
-    st.markdown("<hr>", unsafe_allow_html=True)
 
     # Seção de Análise de Compensação Energética
     with st.expander("Análise de Compensação Energética", expanded=False):
@@ -69,6 +63,8 @@ def show_metrics_page():
             st.metric("Porcentagem de Energia Compensada", f"{metrics['Porcentagem de Energia Compensada']:.2f}%")
         with col2:
             st.metric("Economia com Compensação (R$)", f"R$ {metrics['Economia com Compensação']:.2f}")
+
+    st.markdown("<hr>", unsafe_allow_html=True)
 
 
 def show_charts_page():
