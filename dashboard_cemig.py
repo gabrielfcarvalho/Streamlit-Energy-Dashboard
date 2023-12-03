@@ -119,7 +119,7 @@ def calculate_metrics(data, start_period, end_period):
 
     periodo_formatado = f"{start_period} - {end_period}"
     pct_energia_compensada = (total_energia_compensada / total_consumo) * 100 if total_consumo > 0 else 0
-    custo_medio_por_kwh = total_custo / total_consumo if total_consumo > 0 else 0
+    custo_medio_por_kwh = total_custo / consumo_pago_total if consumo_pago_total > 0 else 0
     economia_compensacao = total_energia_compensada * custo_medio_por_kwh
 
     return {
