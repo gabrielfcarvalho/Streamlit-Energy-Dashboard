@@ -34,8 +34,6 @@ def show_metrics_page():
     with col2:
         st.metric("Total de Energia Gerada (kWh)", f"{metrics['Geração Total']:.2f} kWh")
 
-    st.markdown("<hr>", unsafe_allow_html=True)
-
     # Detalhes dos Custos
     with st.expander("Detalhes dos Custos", expanded=False):
         col1, col2 = st.columns(2)
