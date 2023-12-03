@@ -18,18 +18,30 @@ data = load_data()
 # Função para exibir a página de métricas
 def show_metrics_page():
     st.title('Métricas')
+
+    # Obter período e calcular métricas
     start_period, end_period = setup_metrics(data)
     metrics = calculate_metrics(data, start_period, end_period)
 
-    st.metric("Período de Referência", metrics["Periodo"])
-    st.metric("Consumo Total de Energia (kWh)", f"{metrics['Consumo Total']:.2f} kWh")
-    st.metric("Total de Energia Gerada (kWh)", f"{metrics['Geração Total']:.2f} kWh")
-    st.metric("Custo Total de Energia (R$)", f"R$ {metrics['Custo Total']:.2f}")
-    st.metric("Total de Energia Compensada (kWh)", f"{metrics['Energia Compensada Total']:.2f} kWh")
-    st.metric("Total de Energia Transferida (kWh)", f"{metrics['Energia Transferida Total']:.2f} kWh")
-    st.metric("Saldo Atual de Geração (kWh)", f"{metrics['Saldo Atual de Geração']:.2f} kWh")
-    st.metric("Consumo Pago Total (kWh)", f"{metrics['Consumo Pago Total']:.2f} kWh")
-    st.metric("Média Diária de Consumo (kWh)", f"{metrics['Média Diária de Consumo']:.2f} kWh/dia")
+    # Exibir o período de referência centralizado
+    st.write(f"### Período de Referência: {metrics['Periodo']}")
+
+    # Organizando métricas em colunas abaixo do período de referência
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("Consumo Total de Energia (kWh)", f"{metrics['Consumo Total']:.2f} kWh")
+        st.metric("Total de Energia Gerada (kWh)", f"{metrics['Geração Total']:.2f} kWh")
+        st.metric("Média Diária de Consumo (kWh)", f"{metrics['Média Diária de Consumo']:.2f} kWh/dia")
+
+    with col2:
+        st.metric("Custo Total de Energia (R$)", f"R$ {metrics['Custo Total']:.2f}")
+        st.metric("Total de Energia Compensada (kWh)", f"{metrics['Energia Compensada Total']:.2f} kWh")
+        st.metric("Saldo Atual de Geração (kWh)", f"{metrics['Saldo Atual de Geração']:.2f} kWh")
+
+    with col3:
+        st.metric("Total de Energia Transferida (kWh)", f"{metrics['Energia Transferida Total']:.2f} kWh")
+        st.metric("Consumo Pago Total (kWh)", f"{metrics['Consumo Pago Total']:.2f} kWh")
 
 def show_charts_page():
     st.title('Gráficos')
