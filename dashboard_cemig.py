@@ -34,6 +34,8 @@ def show_metrics_page():
     with col2:
         st.metric("Total de Energia Gerada (kWh)", f"{metrics['Geração Total']:.2f} kWh")
 
+    st.markdown("<hr>", unsafe_allow_html=True)
+
     # Detalhes dos Custos
     with st.expander("Detalhes dos Custos", expanded=False):
         col1, col2 = st.columns(2)
@@ -41,6 +43,8 @@ def show_metrics_page():
             st.metric("Custo de Energia Pago (R$)", f"R$ {metrics['Custo Total']:.2f}")
         with col2:
             st.metric("Consumo Pago (kWh)", f"{metrics['Consumo Pago Total']:.2f} kWh")
+
+    st.markdown("<hr>", unsafe_allow_html=True)
 
     # Energia Compensada e Transferida
     with st.expander("Energia Compensada e Transferida", expanded=False):
@@ -50,6 +54,7 @@ def show_metrics_page():
         with col2:
             st.metric("Total de Energia Transferida (kWh)", f"{metrics['Energia Transferida Total']:.2f} kWh")
 
+    st.markdown("<hr>", unsafe_allow_html=True)
 
     # Expander para Saldo Atual de Geração
     with st.expander("Saldo Atual de Geração Total", expanded=False):
