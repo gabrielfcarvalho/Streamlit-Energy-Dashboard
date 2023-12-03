@@ -58,9 +58,7 @@ def show_metrics_page():
     st.markdown("<hr>", unsafe_allow_html=True)
 
     # Seção de Análise de Compensação Energética
-    with st.container():
-        st.write("### Análise de Compensação Energética")
-        metrics = calculate_metrics(data, start_period, end_period)
+    with st.expander("Análise de Compensação Energética", expanded=False):
         col1, col2 = st.columns(2)
         with col1:
             st.metric("Porcentagem de Energia Compensada", f"{metrics['Porcentagem de Energia Compensada']:.2f}%")
