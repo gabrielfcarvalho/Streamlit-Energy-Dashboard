@@ -52,15 +52,19 @@ def show_metrics_page():
 
     st.markdown("<hr>", unsafe_allow_html=True)
 
-    # Exibindo métricas avançadas
+    # Expander para Saldo Atual de Geração
+    with st.expander("Saldo Atual de Geração Total", expanded=False):
+        st.metric("Saldo Atual de Geração Total (kWh)", f"{metrics['Saldo Atual de Geração']:.2f} kWh")
+
+    # Seção de Análise de Compensação Energética
     with st.container():
-        st.write("### Análise Avançada de Energia")
-        col1, col2, col3 = st.columns(3)
+        st.write("### Análise de Compensação Energética")
+        metrics = calculate_metrics(data, start_period, end_period)
+        col1, col2 = st.columns(2)
         with col1:
-            st.metric("Eficiência de Consumo", f"{metrics['Eficiência de Consumo']:.2f}")
-            st.metric("Custo Médio por kWh", f"R$ {metrics['Custo Médio por kWh']:.2f}")
-        with col2:
             st.metric("Porcentagem de Energia Compensada", f"{metrics['Porcentagem de Energia Compensada']:.2f}%")
+        with col2:
+            st.metric("Economia com Compensação (R$)", f"R$ {metrics['Economia com Compensação']:.2f}")
 
 
 def show_charts_page():
@@ -112,15 +116,10 @@ def calculate_metrics(data, start_period, end_period):
         filtered_sapecado = sapecado_df[sapecado_df['Mês/Ano'].isin(all_dates[start_index:end_index + 1])]
         total_geracao = filtered_sapecado['Energia Gerada em kWh'].sum()
 
-    # Calculando a média diária de consumo
-    dias_totais = sum(filtered_df['Dias Considerados'].sum() for df in data.values())
-    media_diaria_consumo = total_consumo / dias_totais if dias_totais > 0 else 0
-
     periodo_formatado = f"{start_period} - {end_period}"
-    dias_totais = sum(filtered_df['Dias Considerados'].sum() for df in data.values())
-    eficiencia_consumo = total_consumo / dias_totais if dias_totais > 0 else 0
     pct_energia_compensada = (total_energia_compensada / total_consumo) * 100 if total_consumo > 0 else 0
     custo_medio_por_kwh = total_custo / total_consumo if total_consumo > 0 else 0
+    economia_compensacao = total_energia_compensada * custo_medio_por_kwh
 
     return {
         "Periodo": periodo_formatado,
@@ -131,10 +130,8 @@ def calculate_metrics(data, start_period, end_period):
         "Energia Transferida Total": total_energia_transferida,
         "Saldo Atual de Geração": saldo_atual_geracao,
         "Consumo Pago Total": consumo_pago_total,
-        "Média Diária de Consumo": media_diaria_consumo,
-        "Eficiência de Consumo": eficiencia_consumo,
         "Porcentagem de Energia Compensada": pct_energia_compensada,
-        "Custo Médio por kWh": custo_medio_por_kwh
+        "Economia com Compensação": economia_compensacao,
     }
 
 
