@@ -159,6 +159,8 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas, window_
 
     if not df_filtered.empty:
         if chart_type == 'Barra':
+            # Calcula a média móvel
+            df_filtered['Média Móvel'] = df_filtered.groupby('Localidade')[y_label].transform(lambda x: x.rolling(window=window_size, min_periods=1).mean())
             # Criação do gráfico de barras
             bar_traces = []
             for loc in df_filtered['Localidade'].unique():
