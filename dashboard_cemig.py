@@ -4,6 +4,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
+import numpy as np
 
 # Configuração inicial da página
 st.set_page_config(page_title="Análise Energética", page_icon="⚡", layout="wide", initial_sidebar_state="auto")
@@ -179,24 +180,25 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas, window_
 
         # Opção de Mapa de Calor
         elif chart_type == 'Mapa de Calor':
-            # Aqui, você precisaria de uma lógica para definir as posições 'x' e 'y' de cada localidade.
-            # Por exemplo, atribuir números arbitrários ou baseados em algum critério de agrupamento.
-            # Para este exemplo, vamos supor que você tenha uma coluna 'posicao' que representa a posição.
-            
+            # Organizar os dados para o mapa de calor
             localidades = df_filtered['Localidade'].unique()
-            posicoes = range(len(localidades))  # Atribui uma posição para cada localidade
-            valor_metrica = [df_filtered[df_filtered['Localidade'] == loc][y_label].sum() for loc in localidades]  # Soma da métrica para cada localidade
-            # Converter posições para lista, pois Plotly não aceita 'range'
-            posicoes_list = list(posicoes)
+            tempos = df_filtered['Mês/Ano'].unique()
+            z_values = np.zeros((len(localidades), len(tempos)))
+
+            # Preencher a matriz de valores 'z'
+            for i, loc in enumerate(localidades):
+                for j, tempo in enumerate(tempos):
+                    z_values[i, j] = df_filtered[(df_filtered['Localidade'] == loc) & (df_filtered['Mês/Ano'] == tempo)][y_label].sum()
+            
             # Criar o mapa de calor
-            heat_data = [go.Heatmap(
-                z=valor_metrica,
-                x=posicoes_list,
-                y=posicoes_list,
+            heat_data = go.Heatmap(
+                z=z_values,
+                x=tempos,
+                y=localidades,
                 colorscale='Viridis'
-            )]
-            fig = go.Figure(data=heat_data)
-            fig.update_layout(title=title)
+            )
+            fig = go.Figure(data=[heat_data])
+            fig.update_layout(title=title, xaxis_nticks=36)
 
         st.plotly_chart(fig, use_container_width=True)
     else:
