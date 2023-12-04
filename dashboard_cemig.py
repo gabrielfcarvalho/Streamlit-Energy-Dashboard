@@ -69,8 +69,6 @@ def show_charts_page():
     tipo_dado, localidades_selecionadas, tipo_grafico = setup_charts_sidebar(data)
     titulo_grafico = f"{tipo_dado} nas propriedades {', '.join(localidades_selecionadas)}"
     plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas)
-    heatmap_fig = plot_heatmap(data)
-    st.plotly_chart(heatmap_fig, use_container_width=True)
 
 def show_distribution_page():
     st.title('Distribuição de Energia')
@@ -139,22 +137,6 @@ def display_metrics(total_consumo, total_geracao, periodo_formatado):
     col1.metric("Período de Referência", periodo_formatado)
     col2.metric("Consumo Total de Energia (kWh)", "{:,.2f} kWh".format(total_consumo).replace(",", "X").replace(".", ",").replace("X", "."))
     col3.metric("Total de Energia Gerada (kWh)", "{:,.2f} kWh".format(total_geracao).replace(",", "X").replace(".", ",").replace("X", "."))
-
-def plot_heatmap(data):
-    # Pivoteie os dados para o formato adequado para o mapa de calor
-    heatmap_data = data.pivot("Localidade", "Mês/Ano", "Consumo Total em kWh")
-
-    # Criação do mapa de calor
-    fig = px.imshow(heatmap_data,
-                    labels=dict(x="Mês/Ano", y="Localidade", color="Consumo em kWh"),
-                    x=heatmap_data.columns,
-                    y=heatmap_data.index,
-                    aspect="auto",
-                    color_continuous_scale="Viridis")  # Você pode escolher outra escala de cores
-
-    # Personalizações adicionais do gráfico podem ser feitas aqui
-
-    return fig
 
 # Função para gerar os gráficos
 def plot_chart(df, title, y_label, chart_type, localidades_selecionadas):
