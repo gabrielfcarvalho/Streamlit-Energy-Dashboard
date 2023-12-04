@@ -190,12 +190,26 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas, window_
                 for j, tempo in enumerate(tempos):
                     z_values[i, j] = df_filtered[(df_filtered['Localidade'] == loc) & (df_filtered['Mês/Ano'] == tempo)][y_label].sum()
             
+            # Definir os limites para a escala de cores
+            zmin = df_filtered[y_label].min()
+            zmax = df_filtered[y_label].max()
+
+            # Ajustar o colorscale para aumentar o contraste
+            # Aqui, 'Viridis' é substituído por uma escala de cores personalizada
+            colorscale = [
+                [0.0, "rgb(165,0,38)"],   # vermelho escuro
+                [0.5, "rgb(255,255,191)"], # branco
+                [1.0, "rgb(49,54,149)"]    # azul escuro
+            ]
+
             # Criar o mapa de calor
             heat_data = go.Heatmap(
                 z=z_values,
                 x=tempos,
                 y=localidades,
-                colorscale='Viridis'
+                colorscale=colorscale,
+                zmin=zmin, # Definir o valor mínimo da escala de cores
+                zmax=zmax, # Definir o valor máximo da escala de cores
             )
             fig = go.Figure(data=[heat_data])
             fig.update_layout(title=title, xaxis_nticks=36)
