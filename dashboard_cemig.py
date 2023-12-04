@@ -3,6 +3,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objs as go
 
 # Configuração inicial da página
 st.set_page_config(page_title="Análise Energética", page_icon="⚡", layout="wide", initial_sidebar_state="auto")
@@ -139,7 +140,7 @@ def display_metrics(total_consumo, total_geracao, periodo_formatado):
     col3.metric("Total de Energia Gerada (kWh)", "{:,.2f} kWh".format(total_geracao).replace(",", "X").replace(".", ",").replace("X", "."))
 
 # Função para gerar os gráficos
-def plot_chart(df, title, y_label, chart_type, localidades_selecionadas):
+def plot_chart(df, title, y_label, chart_type, localidades_selecionadas, window_size=3):
     # Verifica se 'Energia Gerada em kWh' foi selecionada sem 'Sapecado 1'
     if y_label == 'Energia Gerada em kWh' and 'Sapecado 1' not in localidades_selecionadas:
         st.error("A 'Energia Gerada em kWh' está disponível apenas para 'Sapecado 1'. Selecione 'Sapecado 1' para visualizar esse tipo de dado.")
@@ -152,12 +153,31 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas):
             df_loc = df[localidade].copy()
             df_loc['Localidade'] = localidade
             df_filtered = pd.concat([df_filtered, df_loc])
-    
+
+    # Calcula a média móvel
+    df_filtered['Média Móvel'] = df_filtered.groupby('Localidade')[y_label].transform(lambda x: x.rolling(window=window_size, min_periods=1).mean())
+
     if not df_filtered.empty:
-        if chart_type == 'Linha':
-            fig = px.line(df_filtered, x='Mês/Ano', y=y_label, color='Localidade', title=title)
-        elif chart_type == 'Barra':
-            fig = px.bar(df_filtered, x='Mês/Ano', y=y_label, color='Localidade', barmode='group', title=title)
+        if chart_type == 'Barra':
+            # Criação do gráfico de barras
+            bar_traces = []
+            for loc in df_filtered['Localidade'].unique():
+                df_loc = df_filtered[df_filtered['Localidade'] == loc]
+                bar_traces.append(go.Bar(x=df_loc['Mês/Ano'], y=df_loc[y_label], name=loc))
+            
+            # Criação das linhas da média móvel
+            line_traces = []
+            for loc in df_filtered['Localidade'].unique():
+                df_loc = df_filtered[df_filtered['Localidade'] == loc]
+                line_traces.append(go.Scatter(x=df_loc['Mês/Ano'], y=df_loc['Média Móvel'], name=f'Média Móvel {loc}', mode='lines', line=dict(width=2)))
+            
+            # Combinação dos gráficos de barras e linhas
+            fig = go.Figure(data=bar_traces + line_traces)
+            fig.update_layout(title=title, barmode='group')
+
+        elif chart_type == 'Linha':
+            fig = px.line(df_filtered, x='Mês/Ano', y=[y_label, 'Média Móvel'], color='Localidade', title=title)
+
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.error("Não foram selecionadas propriedades para exibir.")
