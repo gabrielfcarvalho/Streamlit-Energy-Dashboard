@@ -154,33 +154,27 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas, window_
             df_loc['Localidade'] = localidade
             df_filtered = pd.concat([df_filtered, df_loc])
 
-    # Calcula a média móvel
-    df_filtered['Média Móvel'] = df_filtered.groupby('Localidade')[y_label].transform(lambda x: x.rolling(window=window_size, min_periods=1).mean())
+    # Gráfico de linha (sem média móvel)
+    if chart_type == 'Linha':
+        fig = px.line(df_filtered, x='Mês/Ano', y=y_label, color='Localidade', title=title)
 
-    if not df_filtered.empty:
-        if chart_type == 'Barra':
-            # Criação do gráfico de barras
-            bar_traces = []
-            for loc in df_filtered['Localidade'].unique():
-                df_loc = df_filtered[df_filtered['Localidade'] == loc]
-                bar_traces.append(go.Bar(x=df_loc['Mês/Ano'], y=df_loc[y_label], name=loc))
-            
-            # Criação das linhas da média móvel
-            line_traces = []
-            for loc in df_filtered['Localidade'].unique():
-                df_loc = df_filtered[df_filtered['Localidade'] == loc]
-                line_traces.append(go.Scatter(x=df_loc['Mês/Ano'], y=df_loc['Média Móvel'], name=f'Média Móvel {loc}', mode='lines', line=dict(width=2)))
-            
-            # Combinação dos gráficos de barras e linhas
-            fig = go.Figure(data=bar_traces + line_traces)
-            fig.update_layout(title=title, barmode='group')
+    # Gráfico de barras (com média móvel)
+    elif chart_type == 'Barra':
+        # Calcula a média móvel
+        df_filtered['Média Móvel'] = df_filtered.groupby('Localidade')[y_label].transform(lambda x: x.rolling(window=window_size, min_periods=1).mean())
 
-        elif chart_type == 'Linha':
-            fig = px.line(df_filtered, x='Mês/Ano', y=[y_label, 'Média Móvel'], color='Localidade', title=title)
+        # Criação do gráfico de barras
+        bar_traces = [go.Bar(x=df_loc['Mês/Ano'], y=df_loc[y_label], name=loc) for loc in df_filtered['Localidade'].unique()]
 
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.error("Não foram selecionadas propriedades para exibir.")
+        # Criação das linhas da média móvel
+        line_traces = [go.Scatter(x=df_loc['Mês/Ano'], y=df_loc['Média Móvel'], name=f'Média Móvel {loc}', mode='lines', line=dict(width=2, color='red')) for loc in df_filtered['Localidade'].unique()]
+
+        # Combinação dos gráficos de barras e linhas
+        fig = go.Figure(data=bar_traces + line_traces)
+        fig.update_layout(title=title, barmode='group')
+
+    # Exibir o gráfico no Streamlit
+    st.plotly_chart(fig, use_container_width=True)
 
 # Função de configuração da barra lateral para gráficos
 def setup_charts_sidebar(data):
