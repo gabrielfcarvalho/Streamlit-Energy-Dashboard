@@ -176,7 +176,7 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas, window_
             fig.update_layout(title=title, barmode='group')
 
         elif chart_type == 'Linha':
-            fig = px.line(df_filtered, x='Mês/Ano', y=[y_label, 'Média Móvel'], color='Localidade', title=title)
+            fig = px.line(df_filtered, x='Mês/Ano', y=y_label, color='Localidade', title=title)
 
         st.plotly_chart(fig, use_container_width=True)
     else:
