@@ -186,12 +186,13 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas, window_
             localidades = df_filtered['Localidade'].unique()
             posicoes = range(len(localidades))  # Atribui uma posição para cada localidade
             valor_metrica = [df_filtered[df_filtered['Localidade'] == loc][y_label].sum() for loc in localidades]  # Soma da métrica para cada localidade
-            
+            # Converter posições para lista, pois Plotly não aceita 'range'
+            posicoes_list = list(posicoes)
             # Criar o mapa de calor
             heat_data = [go.Heatmap(
                 z=valor_metrica,
-                x=posicoes,
-                y=posicoes,
+                x=posicoes_list,
+                y=posicoes_list,
                 colorscale='Viridis'
             )]
             fig = go.Figure(data=heat_data)
