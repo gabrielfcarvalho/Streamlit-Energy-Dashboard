@@ -177,6 +177,26 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas, window_
         elif chart_type == 'Linha':
             fig = px.line(df_filtered, x='Mês/Ano', y=y_label, color='Localidade', title=title)
 
+        # Opção de Mapa de Calor
+        elif chart_type == 'Mapa de Calor':
+            # Aqui, você precisaria de uma lógica para definir as posições 'x' e 'y' de cada localidade.
+            # Por exemplo, atribuir números arbitrários ou baseados em algum critério de agrupamento.
+            # Para este exemplo, vamos supor que você tenha uma coluna 'posicao' que representa a posição.
+            
+            localidades = df_filtered['Localidade'].unique()
+            posicoes = range(len(localidades))  # Atribui uma posição para cada localidade
+            valor_metrica = [df_filtered[df_filtered['Localidade'] == loc][y_label].sum() for loc in localidades]  # Soma da métrica para cada localidade
+            
+            # Criar o mapa de calor
+            heat_data = [go.Heatmap(
+                z=valor_metrica,
+                x=posicoes,
+                y=posicoes,
+                colorscale='Viridis'
+            )]
+            fig = go.Figure(data=heat_data)
+            fig.update_layout(title=title)
+
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.error("Não foram selecionadas propriedades para exibir.")
@@ -188,7 +208,7 @@ def setup_charts_sidebar(data):
         tipo_dado = st.selectbox('Selecione o que você gostaria de saber:', ['Consumo Total em kWh', 'Energia Compensada em kWh', 'Energia Transferida em kWh', 'Energia Gerada em kWh', 'Saldo Atual de Geração em kWh', 'Consumo Pago em kWh'])
         opcoes_localidades = list(data.keys())
         localidades_selecionadas = st.multiselect("Selecione as propriedades que deseja obter as informações:", options=opcoes_localidades, default=opcoes_localidades[0])
-        tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra'))
+        tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra', 'Mapa de Calor'))
         return tipo_dado, localidades_selecionadas, tipo_grafico
 
 # Função de configuração da barra lateral para distribuição de energia
