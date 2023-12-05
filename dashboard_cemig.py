@@ -74,14 +74,14 @@ def show_charts_page():
 
 def show_distribution_page():
     st.title('Distribuição de Energia')
-    selected_month = setup_distribution_sidebar(data)
+    selected_month, num_meses_futuro = setup_distribution_sidebar(data)
     display_monthly_energy_distribution(data, selected_month)
     with st.expander(f"Visualizar Sugestão de Distribuição Baseada no Consumo do mês {selected_month}"):
         display_suggested_energy_distribution(data, selected_month)
     # Adicionando a nova seção para sugestão de distribuição futura
-    with st.expander(f"Sugestão de Distribuição do 'Sapecado 1' para o Mês {selected_month}"):
+    with st.expander(f"Sugestão de Distribuição de Energia para os Próximos {num_meses_futuro} Meses"):
         # Calcular a distribuição sugerida
-        distribuicao_sugerida = calcular_distribuicao_sapecado1(data, selected_month)
+        distribuicao_sugerida = calcular_distribuicao_sapecado1(data, num_meses_futuro)
 
         # Preparar dados para o gráfico de pizza
         labels = list(distribuicao_sugerida.keys())
@@ -89,33 +89,31 @@ def show_distribution_page():
 
         # Criando o gráfico de pizza
         fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
-        fig.update_layout(title_text=f'Distribuição de Energia Sugerida (%) do "Sapecado 1" para {selected_month}')
+        fig.update_layout(title_text=f'Distribuição de Energia Sugerida (%) para os Próximos {num_meses_futuro} Meses')
         st.plotly_chart(fig)
 
 
-# Função para calcular a necessidade de energia de cada localidade
-def calcular_necessidade_energia(data, selected_month):
+# Função para calcular a necessidade de energia de cada localidade para os meses futuros
+def calcular_necessidade_energia(data, num_meses_futuro):
     necessidade_energia = {}
     for loc, df in data.items():
-        if loc != 'Sapecado 1':
-            df_mes = df[df['Mês/Ano'] == selected_month]
-            saldo_geracao = df_mes['Saldo Atual de Geração em kWh'].iloc[-1] if not df_mes.empty else 0
-            consumo_medio = df['Consumo Total em kWh'].mean()
-            necessidade = max(0, consumo_medio - saldo_geracao)
-            necessidade_energia[loc] = necessidade
+        consumo_medio = df['Consumo Total em kWh'].mean()
+        saldo_geracao = df['Saldo Atual de Geração em kWh'].iloc[-1]
+        necessidade = max(0, (consumo_medio * num_meses_futuro) - saldo_geracao)
+        necessidade_energia[loc] = necessidade
     return necessidade_energia
 
-# Função para calcular a distribuição de energia do "Sapecado 1"
-def calcular_distribuicao_sapecado1(data, selected_month):
-    df_sapecado1 = data['Sapecado 1'][data['Sapecado 1']['Mês/Ano'] == selected_month]
-    energia_disponivel = df_sapecado1['Energia Gerada em kWh'].sum() if not df_sapecado1.empty else 0
-    necessidade_energia = calcular_necessidade_energia(data, selected_month)
+# Função para calcular a distribuição de energia do "Sapecado 1" para os meses futuros
+def calcular_distribuicao_sapecado1(data, num_meses_futuro):
+    energia_disponivel_mensal = data['Sapecado 1']['Energia Gerada em kWh'].mean()
+    energia_disponivel_total = energia_disponivel_mensal * num_meses_futuro
+    necessidade_energia = calcular_necessidade_energia(data, num_meses_futuro)
     total_necessidade = sum(necessidade_energia.values())
 
     distribuicao_sugerida = {}
     for loc, necessidade in necessidade_energia.items():
         proporcao = (necessidade / total_necessidade) if total_necessidade > 0 else 0
-        distribuicao_sugerida[loc] = proporcao * energia_disponivel
+        distribuicao_sugerida[loc] = proporcao * energia_disponivel_total
 
     return distribuicao_sugerida
 
@@ -265,9 +263,17 @@ def setup_charts_sidebar(data):
 def setup_distribution_sidebar(data):
     with st.sidebar:
         st.title('Filtro para a Distribuição da Energia Gerada')
+
+        # Seleção do mês de referência
+        st.markdown("Escolha o mês de referência:")
         meses_disponiveis = data['Sapecado 1']['Mês/Ano'].unique()
-        selected_month = st.selectbox('Escolha o mês de referência:', meses_disponiveis)
-        return selected_month
+        selected_month = st.selectbox('Mês de Referência:', meses_disponiveis)
+
+        # Entrada para o número de meses futuros a serem analisados
+        st.markdown("Defina o período futuro para análise:")
+        num_meses_futuro = st.number_input('Número de meses futuros:', min_value=1, max_value=12, value=1)
+
+        return selected_month, num_meses_futuro
 
 # Função de configuração da barra lateral para métricas
 def setup_metrics(data):
