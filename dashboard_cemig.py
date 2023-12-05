@@ -75,22 +75,26 @@ def show_charts_page():
 def show_distribution_page():
     st.title('Distribuição de Energia')
     selected_month, num_meses_futuro = setup_distribution_sidebar(data)
+    
+
+    # Seção de Distribuição Atual
+    st.subheader(f'Distribuição de Energia para o Mês: {selected_month}')
     display_monthly_energy_distribution(data, selected_month)
     with st.expander(f"Visualizar Sugestão de Distribuição Baseada no Consumo do mês {selected_month}"):
         display_suggested_energy_distribution(data, selected_month)
-    # Adicionando a nova seção para sugestão de distribuição futura
-    with st.expander(f"Sugestão de Distribuição de Energia para os Próximos {num_meses_futuro} Meses"):
-        # Calcular a distribuição sugerida
-        distribuicao_sugerida = calcular_distribuicao_sapecado1(data, num_meses_futuro)
+    # Seção de Distribuição Futura
+    st.subheader(f'Distribuição de Energia Sugerida para os Próximos {num_meses_futuro} Meses')
+    # Calcular a distribuição sugerida
+    distribuicao_sugerida = calcular_distribuicao_sapecado1(data, num_meses_futuro)
 
-        # Preparar dados para o gráfico de pizza
-        labels = list(distribuicao_sugerida.keys())
-        values = list(distribuicao_sugerida.values())
+    # Preparar dados para o gráfico de pizza
+    labels = list(distribuicao_sugerida.keys())
+    values = list(distribuicao_sugerida.values())
 
-        # Criando o gráfico de pizza
-        fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
-        fig.update_layout(title_text=f'Distribuição de Energia Sugerida (%) para os Próximos {num_meses_futuro} Meses')
-        st.plotly_chart(fig)
+    # Criando o gráfico de pizza
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
+    fig.update_layout(title_text=f'Distribuição de Energia (%) do "Sapecado 1" para os Próximos {num_meses_futuro} Meses')
+    st.plotly_chart(fig)
 
 
 # Função para calcular a necessidade de energia de cada localidade para os meses futuros
