@@ -14,8 +14,78 @@ st.set_page_config(page_title="Análise Energética", page_icon="⚡", layout="w
 def load_data():
     return pd.read_excel("Dados.xlsx", sheet_name=None)
 
-# Carregar dados do Excel
-data = load_data()
+# Função de configuração da barra lateral para métricas
+def setup_metrics(data):
+    with st.sidebar:
+        st.title('Filtros para as Métricas')
+        # Criar lista de meses/anos mantendo a ordem original
+        all_dates = []
+        for df in data.values():
+            for date in df['Mês/Ano']:
+                if date not in all_dates:
+                    all_dates.append(date)
+
+        # Seletores para escolher o período de referência com rótulos
+        start_period = st.selectbox('Data Inicial', all_dates, index=0)
+        # Atualiza as opções para a data final com base na seleção inicial
+        end_period_options = all_dates[all_dates.index(start_period):]
+        end_period = st.selectbox('Data Final', end_period_options, index=0)
+
+        return start_period, end_period
+
+def calculate_metrics(data, start_period, end_period):
+    total_consumo = 0
+    total_geracao = 0
+    total_custo = 0
+    total_energia_compensada = 0
+    total_energia_transferida = 0
+    saldo_atual_geracao = 0
+    consumo_pago_total = 0
+
+    # Criar lista de meses/anos mantendo a ordem original
+    all_dates = []
+    for df in data.values():
+        for date in df['Mês/Ano']:
+            if date not in all_dates:
+                all_dates.append(date)
+
+    # Obtendo os índices das datas inicial e final na lista ordenada
+    start_index = all_dates.index(start_period)
+    end_index = all_dates.index(end_period)
+ 
+    # Processando cada dataframe e somando os valores
+    for df in data.values():
+        filtered_df = df[df['Mês/Ano'].isin(all_dates[start_index:end_index + 1])]
+        total_consumo += filtered_df['Consumo Total em kWh'].sum()
+        total_custo += filtered_df['Valor a Pagar (R$)'].sum()
+        total_energia_compensada += filtered_df['Energia Compensada em kWh'].sum()
+        total_energia_transferida += filtered_df['Energia Transferida em kWh'].sum()
+        saldo_atual_geracao += filtered_df['Saldo Atual de Geração em kWh'].iloc[-1]  # Assumindo que o saldo mais recente é relevante
+        consumo_pago_total += filtered_df['Consumo Pago em kWh'].sum()
+
+    # Tratamento específico para 'Sapecado 1'
+    if 'Sapecado 1' in data:
+        sapecado_df = data['Sapecado 1']
+        filtered_sapecado = sapecado_df[sapecado_df['Mês/Ano'].isin(all_dates[start_index:end_index + 1])]
+        total_geracao = filtered_sapecado['Energia Gerada em kWh'].sum()
+
+    periodo_formatado = f"{start_period} - {end_period}"
+    pct_energia_compensada = (total_energia_compensada / total_consumo) * 100 if total_consumo > 0 else 0
+    custo_medio_por_kwh = total_custo / consumo_pago_total if consumo_pago_total > 0 else 0
+    economia_compensacao = total_energia_compensada * custo_medio_por_kwh
+
+    return {
+        "Periodo": periodo_formatado,
+        "Consumo Total": total_consumo,
+        "Geração Total": total_geracao,
+        "Custo Total": total_custo,
+        "Energia Compensada Total": total_energia_compensada,
+        "Energia Transferida Total": total_energia_transferida,
+        "Saldo Atual de Geração": saldo_atual_geracao,
+        "Consumo Pago Total": consumo_pago_total,
+        "Porcentagem de Energia Compensada": pct_energia_compensada,
+        "Economia com Compensação": economia_compensacao,
+    }
 
 # Função para exibir a página de métricas com um layout personalizado
 def show_metrics_page():
@@ -131,68 +201,6 @@ def calcular_distribuicao_sapecado1(data, num_meses_futuro):
 
     return distribuicao_sugerida
 
-
-def calculate_metrics(data, start_period, end_period):
-    total_consumo = 0
-    total_geracao = 0
-    total_custo = 0
-    total_energia_compensada = 0
-    total_energia_transferida = 0
-    saldo_atual_geracao = 0
-    consumo_pago_total = 0
-
-    # Criar lista de meses/anos mantendo a ordem original
-    all_dates = []
-    for df in data.values():
-        for date in df['Mês/Ano']:
-            if date not in all_dates:
-                all_dates.append(date)
-
-    # Obtendo os índices das datas inicial e final na lista ordenada
-    start_index = all_dates.index(start_period)
-    end_index = all_dates.index(end_period)
- 
-    # Processando cada dataframe e somando os valores
-    for df in data.values():
-        filtered_df = df[df['Mês/Ano'].isin(all_dates[start_index:end_index + 1])]
-        total_consumo += filtered_df['Consumo Total em kWh'].sum()
-        total_custo += filtered_df['Valor a Pagar (R$)'].sum()
-        total_energia_compensada += filtered_df['Energia Compensada em kWh'].sum()
-        total_energia_transferida += filtered_df['Energia Transferida em kWh'].sum()
-        saldo_atual_geracao += filtered_df['Saldo Atual de Geração em kWh'].iloc[-1]  # Assumindo que o saldo mais recente é relevante
-        consumo_pago_total += filtered_df['Consumo Pago em kWh'].sum()
-
-    # Tratamento específico para 'Sapecado 1'
-    if 'Sapecado 1' in data:
-        sapecado_df = data['Sapecado 1']
-        filtered_sapecado = sapecado_df[sapecado_df['Mês/Ano'].isin(all_dates[start_index:end_index + 1])]
-        total_geracao = filtered_sapecado['Energia Gerada em kWh'].sum()
-
-    periodo_formatado = f"{start_period} - {end_period}"
-    pct_energia_compensada = (total_energia_compensada / total_consumo) * 100 if total_consumo > 0 else 0
-    custo_medio_por_kwh = total_custo / consumo_pago_total if consumo_pago_total > 0 else 0
-    economia_compensacao = total_energia_compensada * custo_medio_por_kwh
-
-    return {
-        "Periodo": periodo_formatado,
-        "Consumo Total": total_consumo,
-        "Geração Total": total_geracao,
-        "Custo Total": total_custo,
-        "Energia Compensada Total": total_energia_compensada,
-        "Energia Transferida Total": total_energia_transferida,
-        "Saldo Atual de Geração": saldo_atual_geracao,
-        "Consumo Pago Total": consumo_pago_total,
-        "Porcentagem de Energia Compensada": pct_energia_compensada,
-        "Economia com Compensação": economia_compensacao,
-    }
-
-
-def display_metrics(total_consumo, total_geracao, periodo_formatado):
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Período de Referência", periodo_formatado)
-    col2.metric("Consumo Total de Energia (kWh)", "{:,.2f} kWh".format(total_consumo).replace(",", "X").replace(".", ",").replace("X", "."))
-    col3.metric("Total de Energia Gerada (kWh)", "{:,.2f} kWh".format(total_geracao).replace(",", "X").replace(".", ",").replace("X", "."))
-
 # Função para gerar os gráficos
 def plot_chart(df, title, y_label, chart_type, localidades_selecionadas, window_size=3):
     # Verifica se 'Energia Gerada em kWh' foi selecionada sem 'Sapecado 1'
@@ -289,25 +297,6 @@ def setup_distribution_sidebar(data):
 
         return selected_month, num_meses_futuro
 
-# Função de configuração da barra lateral para métricas
-def setup_metrics(data):
-    with st.sidebar:
-        st.title('Filtros para as Métricas')
-        # Criar lista de meses/anos mantendo a ordem original
-        all_dates = []
-        for df in data.values():
-            for date in df['Mês/Ano']:
-                if date not in all_dates:
-                    all_dates.append(date)
-
-        # Seletores para escolher o período de referência com rótulos
-        start_period = st.selectbox('Data Inicial', all_dates, index=0)
-        # Atualiza as opções para a data final com base na seleção inicial
-        end_period_options = all_dates[all_dates.index(start_period):]
-        end_period = st.selectbox('Data Final', end_period_options, index=0)
-
-        return start_period, end_period
-
 # Atualização da função para calcular a energia transferida
 def calculate_energy_transferred(data, loc, selected_month_index):
     loc_data = data[loc]
@@ -348,6 +337,10 @@ def display_suggested_energy_distribution(data, selected_month):
         st.plotly_chart(fig)
     else:
         st.write("Não há dados de consumo para exibir.")
+
+
+# Carregar dados do Excel
+data = load_data()
 
 # Seletor de páginas na barra lateral
 with st.sidebar:
