@@ -1,4 +1,4 @@
-#Versao Final
+#Versao Final Organizada e Detalhada
 
 import streamlit as st
 import pandas as pd
@@ -135,71 +135,15 @@ def show_metrics_page():
 
     st.markdown("<hr>", unsafe_allow_html=True)
 
-
-def show_charts_page():
-    st.title('Gráficos')
-    tipo_dado, localidades_selecionadas, tipo_grafico = setup_charts_sidebar(data)
-    titulo_grafico = f"{tipo_dado} nas propriedades {', '.join(localidades_selecionadas)}"
-    plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas)
-
-def show_distribution_page():
-    st.title('Distribuição de Energia')
-    selected_month, num_meses_futuro = setup_distribution_sidebar(data)
-    
-
-    # Seção de Distribuição Atual
-    st.subheader(f'Distribuição de Energia para o Mês: {selected_month}')
-    display_monthly_energy_distribution(data, selected_month)
-    with st.expander(f"Visualizar Sugestão de Distribuição Baseada no Consumo do mês {selected_month}"):
-        display_suggested_energy_distribution(data, selected_month)
-    # Seção de Distribuição Futura
-    st.subheader(f'Distribuição de Energia Sugerida para os Próximos {num_meses_futuro} Meses')
-    st.caption('A distribuição de energia é baseada na média do consumo total e no saldo de geração de cada localidade.')
-    # Calcular a distribuição sugerida
-    distribuicao_sugerida = calcular_distribuicao_sapecado1(data, num_meses_futuro)
-
-    # Preparar dados para o gráfico de pizza
-    labels = list(distribuicao_sugerida.keys())
-    values = list(distribuicao_sugerida.values())
-
-    # Criando o gráfico de pizza
-    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
-    fig.update_layout(title_text=f'Distribuição de Energia (%) para os Próximos {num_meses_futuro} Meses')
-    st.plotly_chart(fig)
-
-    # Adicionar uma seção de metodologia para explicar o cálculo em detalhes
-    with st.expander('Metodologia de Cálculo'):
-        st.write("""
-        A distribuição de energia sugerida é calculada da seguinte forma:
-        - A necessidade de energia é estimada com base na média do consumo histórico de cada localidade.
-        - O saldo de geração atual é subtraído da necessidade estimada.
-        - A energia gerada pelo "Sapecado 1" é distribuída proporcionalmente às necessidades calculadas de cada localidade.
-        """)
-
-
-# Função para calcular a necessidade de energia de cada localidade para os meses futuros
-def calcular_necessidade_energia(data, num_meses_futuro):
-    necessidade_energia = {}
-    for loc, df in data.items():
-        consumo_medio = df['Consumo Total em kWh'].mean()
-        saldo_geracao = df['Saldo Atual de Geração em kWh'].iloc[-1]
-        necessidade = max(0, (consumo_medio * num_meses_futuro) - saldo_geracao)
-        necessidade_energia[loc] = necessidade
-    return necessidade_energia
-
-# Função para calcular a distribuição de energia do "Sapecado 1" para os meses futuros
-def calcular_distribuicao_sapecado1(data, num_meses_futuro):
-    energia_disponivel_mensal = data['Sapecado 1']['Energia Gerada em kWh'].mean()
-    energia_disponivel_total = energia_disponivel_mensal * num_meses_futuro
-    necessidade_energia = calcular_necessidade_energia(data, num_meses_futuro)
-    total_necessidade = sum(necessidade_energia.values())
-
-    distribuicao_sugerida = {}
-    for loc, necessidade in necessidade_energia.items():
-        proporcao = (necessidade / total_necessidade) if total_necessidade > 0 else 0
-        distribuicao_sugerida[loc] = proporcao * energia_disponivel_total
-
-    return distribuicao_sugerida
+# Função de configuração da barra lateral para gráficos
+def setup_charts_sidebar(data):
+    with st.sidebar:
+        st.title('Filtros para os Gráficos')
+        tipo_dado = st.selectbox('Selecione o que você gostaria de saber:', ['Consumo Total em kWh', 'Energia Compensada em kWh', 'Energia Transferida em kWh', 'Energia Gerada em kWh', 'Saldo Atual de Geração em kWh', 'Consumo Pago em kWh'])
+        opcoes_localidades = list(data.keys())
+        localidades_selecionadas = st.multiselect("Selecione as propriedades que deseja obter as informações:", options=opcoes_localidades, default=opcoes_localidades[0])
+        tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra', 'Mapa de Calor'))
+        return tipo_dado, localidades_selecionadas, tipo_grafico
 
 # Função para gerar os gráficos
 def plot_chart(df, title, y_label, chart_type, localidades_selecionadas, window_size=3):
@@ -271,15 +215,11 @@ def plot_chart(df, title, y_label, chart_type, localidades_selecionadas, window_
     else:
         st.error("Não foram selecionadas propriedades para exibir.")
 
-# Função de configuração da barra lateral para gráficos
-def setup_charts_sidebar(data):
-    with st.sidebar:
-        st.title('Filtros para os Gráficos')
-        tipo_dado = st.selectbox('Selecione o que você gostaria de saber:', ['Consumo Total em kWh', 'Energia Compensada em kWh', 'Energia Transferida em kWh', 'Energia Gerada em kWh', 'Saldo Atual de Geração em kWh', 'Consumo Pago em kWh'])
-        opcoes_localidades = list(data.keys())
-        localidades_selecionadas = st.multiselect("Selecione as propriedades que deseja obter as informações:", options=opcoes_localidades, default=opcoes_localidades[0])
-        tipo_grafico = st.radio('Selecione o tipo de gráfico:', ('Linha', 'Barra', 'Mapa de Calor'))
-        return tipo_dado, localidades_selecionadas, tipo_grafico
+def show_charts_page():
+    st.title('Gráficos')
+    tipo_dado, localidades_selecionadas, tipo_grafico = setup_charts_sidebar(data)
+    titulo_grafico = f"{tipo_dado} nas propriedades {', '.join(localidades_selecionadas)}"
+    plot_chart(data, titulo_grafico, tipo_dado, tipo_grafico, localidades_selecionadas)
 
 # Função de configuração da barra lateral para distribuição de energia
 def setup_distribution_sidebar(data):
@@ -322,6 +262,7 @@ def display_monthly_energy_distribution(data, selected_month):
     else:
         st.write("Não há dados de energia transferida para exibir.")
 
+
 def display_suggested_energy_distribution(data, selected_month):
 
     consumption_data = []
@@ -338,6 +279,63 @@ def display_suggested_energy_distribution(data, selected_month):
     else:
         st.write("Não há dados de consumo para exibir.")
 
+# Função para calcular a necessidade de energia de cada localidade para os meses futuros
+def calcular_necessidade_energia(data, num_meses_futuro):
+    necessidade_energia = {}
+    for loc, df in data.items():
+        consumo_medio = df['Consumo Total em kWh'].mean()
+        saldo_geracao = df['Saldo Atual de Geração em kWh'].iloc[-1]
+        necessidade = max(0, (consumo_medio * num_meses_futuro) - saldo_geracao)
+        necessidade_energia[loc] = necessidade
+    return necessidade_energia
+
+# Função para calcular a distribuição de energia do "Sapecado 1" para os meses futuros
+def calcular_distribuicao_sapecado1(data, num_meses_futuro):
+    energia_disponivel_mensal = data['Sapecado 1']['Energia Gerada em kWh'].mean()
+    energia_disponivel_total = energia_disponivel_mensal * num_meses_futuro
+    necessidade_energia = calcular_necessidade_energia(data, num_meses_futuro)
+    total_necessidade = sum(necessidade_energia.values())
+
+    distribuicao_sugerida = {}
+    for loc, necessidade in necessidade_energia.items():
+        proporcao = (necessidade / total_necessidade) if total_necessidade > 0 else 0
+        distribuicao_sugerida[loc] = proporcao * energia_disponivel_total
+
+    return distribuicao_sugerida
+
+def show_distribution_page():
+    st.title('Distribuição de Energia')
+    selected_month, num_meses_futuro = setup_distribution_sidebar(data)
+    
+
+    # Seção de Distribuição Atual
+    st.subheader(f'Distribuição de Energia para o Mês: {selected_month}')
+    display_monthly_energy_distribution(data, selected_month)
+    with st.expander(f"Visualizar Sugestão de Distribuição Baseada no Consumo do mês {selected_month}"):
+        display_suggested_energy_distribution(data, selected_month)
+    # Seção de Distribuição Futura
+    st.subheader(f'Distribuição de Energia Sugerida para os Próximos {num_meses_futuro} Meses')
+    st.caption('A distribuição de energia é baseada na média do consumo total e no saldo de geração de cada localidade.')
+    # Calcular a distribuição sugerida
+    distribuicao_sugerida = calcular_distribuicao_sapecado1(data, num_meses_futuro)
+
+    # Preparar dados para o gráfico de pizza
+    labels = list(distribuicao_sugerida.keys())
+    values = list(distribuicao_sugerida.values())
+
+    # Criando o gráfico de pizza
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
+    fig.update_layout(title_text=f'Distribuição de Energia (%) para os Próximos {num_meses_futuro} Meses')
+    st.plotly_chart(fig)
+
+    # Adicionar uma seção de metodologia para explicar o cálculo em detalhes
+    with st.expander('Metodologia de Cálculo'):
+        st.write("""
+        A distribuição de energia sugerida é calculada da seguinte forma:
+        - A necessidade de energia é estimada com base na média do consumo histórico de cada localidade.
+        - O saldo de geração atual é subtraído da necessidade estimada.
+        - A energia gerada pelo "Sapecado 1" é distribuída proporcionalmente às necessidades calculadas de cada localidade.
+        """)
 
 # Carregar dados do Excel
 data = load_data()
