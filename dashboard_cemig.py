@@ -79,9 +79,9 @@ def show_distribution_page():
     with st.expander(f"Visualizar Sugestão de Distribuição Baseada no Consumo do mês {selected_month}"):
         display_suggested_energy_distribution(data, selected_month)
     # Adicionando a nova seção para sugestão de distribuição futura
-    with st.expander(f"Sugestão de Distribuição para os Meses Futuros"):
+    with st.expander(f"Sugestão de Distribuição do 'Sapecado 1' para o Mês {selected_month}"):
         # Calcular a distribuição sugerida
-        distribuicao_sugerida = calcular_distribuicao_sugerida(data)
+        distribuicao_sugerida = calcular_distribuicao_sapecado1(data, selected_month)
 
         # Preparar dados para o gráfico de pizza
         labels = list(distribuicao_sugerida.keys())
@@ -89,25 +89,34 @@ def show_distribution_page():
 
         # Criando o gráfico de pizza
         fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
-        fig.update_layout(title_text='Distribuição de Energia Sugerida (%)')
+        fig.update_layout(title_text=f'Distribuição de Energia Sugerida (%) do "Sapecado 1" para {selected_month}')
         st.plotly_chart(fig)
 
-# Função para calcular a média de consumo de cada localidade
-def calcular_media_consumo(data):
-    media_consumo = {}
-    for loc, df in data.items():
-        media_consumo[loc] = df['Consumo Total em kWh'].mean()
-    return media_consumo
 
-# Função para calcular a distribuição de energia sugerida em porcentagem
-def calcular_distribuicao_sugerida(data):
-    media_consumo = calcular_media_consumo(data)
-    saldo_total = sum(df['Saldo Atual de Geração em kWh'].iloc[-1] for df in data.values())
-    
+# Função para calcular a necessidade de energia de cada localidade
+def calcular_necessidade_energia(data, selected_month):
+    necessidade_energia = {}
+    for loc, df in data.items():
+        if loc != 'Sapecado 1':
+            df_mes = df[df['Mês/Ano'] == selected_month]
+            saldo_geracao = df_mes['Saldo Atual de Geração em kWh'].iloc[-1] if not df_mes.empty else 0
+            consumo_medio = df['Consumo Total em kWh'].mean()
+            necessidade = max(0, consumo_medio - saldo_geracao)
+            necessidade_energia[loc] = necessidade
+    return necessidade_energia
+
+# Função para calcular a distribuição de energia do "Sapecado 1"
+def calcular_distribuicao_sapecado1(data, selected_month):
+    df_sapecado1 = data['Sapecado 1'][data['Sapecado 1']['Mês/Ano'] == selected_month]
+    energia_disponivel = df_sapecado1['Energia Gerada em kWh'].sum() if not df_sapecado1.empty else 0
+    necessidade_energia = calcular_necessidade_energia(data, selected_month)
+    total_necessidade = sum(necessidade_energia.values())
+
     distribuicao_sugerida = {}
-    for loc, consumo_medio in media_consumo.items():
-        distribuicao_sugerida[loc] = (consumo_medio / saldo_total) * 100 if saldo_total > 0 else 0
-    
+    for loc, necessidade in necessidade_energia.items():
+        proporcao = (necessidade / total_necessidade) if total_necessidade > 0 else 0
+        distribuicao_sugerida[loc] = proporcao * energia_disponivel
+
     return distribuicao_sugerida
 
 
