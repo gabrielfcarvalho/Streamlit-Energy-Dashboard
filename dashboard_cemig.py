@@ -1,4 +1,4 @@
-#Versao 2.0
+#Versao Final
 
 import streamlit as st
 import pandas as pd
@@ -84,6 +84,7 @@ def show_distribution_page():
         display_suggested_energy_distribution(data, selected_month)
     # Seção de Distribuição Futura
     st.subheader(f'Distribuição de Energia Sugerida para os Próximos {num_meses_futuro} Meses')
+    st.caption('A distribuição de energia é baseada na média do consumo total e no saldo de geração de cada localidade.')
     # Calcular a distribuição sugerida
     distribuicao_sugerida = calcular_distribuicao_sapecado1(data, num_meses_futuro)
 
@@ -95,6 +96,15 @@ def show_distribution_page():
     fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
     fig.update_layout(title_text=f'Distribuição de Energia (%) para os Próximos {num_meses_futuro} Meses')
     st.plotly_chart(fig)
+
+    # Adicionar uma seção de metodologia para explicar o cálculo em detalhes
+    with st.expander('Metodologia de Cálculo'):
+        st.write("""
+        A distribuição de energia sugerida é calculada da seguinte forma:
+        - A necessidade de energia é estimada com base na média do consumo histórico de cada localidade.
+        - O saldo de geração atual é subtraído da necessidade estimada.
+        - A energia gerada pelo "Sapecado 1" é distribuída proporcionalmente às necessidades calculadas de cada localidade.
+        """)
 
 
 # Função para calcular a necessidade de energia de cada localidade para os meses futuros
