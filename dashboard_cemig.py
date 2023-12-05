@@ -93,7 +93,7 @@ def show_distribution_page():
 
     # Criando o gráfico de pizza
     fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
-    fig.update_layout(title_text=f'Distribuição de Energia (%) do "Sapecado 1" para os Próximos {num_meses_futuro} Meses')
+    fig.update_layout(title_text=f'Distribuição de Energia (%) para os Próximos {num_meses_futuro} Meses')
     st.plotly_chart(fig)
 
 
