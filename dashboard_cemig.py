@@ -78,6 +78,38 @@ def show_distribution_page():
     display_monthly_energy_distribution(data, selected_month)
     with st.expander(f"Visualizar Sugestão de Distribuição Baseada no Consumo do mês {selected_month}"):
         display_suggested_energy_distribution(data, selected_month)
+    # Adicionando a nova seção para sugestão de distribuição futura
+    with st.expander(f"Sugestão de Distribuição para os Meses Futuros"):
+        # Calcular a distribuição sugerida
+        distribuicao_sugerida = calcular_distribuicao_sugerida(data)
+
+        # Preparar dados para o gráfico de pizza
+        labels = list(distribuicao_sugerida.keys())
+        values = list(distribuicao_sugerida.values())
+
+        # Criando o gráfico de pizza
+        fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
+        fig.update_layout(title_text='Distribuição de Energia Sugerida (%)')
+        st.plotly_chart(fig)
+
+# Função para calcular a média de consumo de cada localidade
+def calcular_media_consumo(data):
+    media_consumo = {}
+    for loc, df in data.items():
+        media_consumo[loc] = df['Consumo Total em kWh'].mean()
+    return media_consumo
+
+# Função para calcular a distribuição de energia sugerida em porcentagem
+def calcular_distribuicao_sugerida(data):
+    media_consumo = calcular_media_consumo(data)
+    saldo_total = sum(df['Saldo Atual de Geração em kWh'].iloc[-1] for df in data.values())
+    
+    distribuicao_sugerida = {}
+    for loc, consumo_medio in media_consumo.items():
+        distribuicao_sugerida[loc] = (consumo_medio / saldo_total) * 100 if saldo_total > 0 else 0
+    
+    return distribuicao_sugerida
+
 
 def calculate_metrics(data, start_period, end_period):
     total_consumo = 0
