@@ -1,22 +1,22 @@
-# Dashboard de Consumo e Geração de Energia
+# Energy Consumption and Generation Dashboard
 
-Este repositório contém um dashboard interativo desenvolvido com Streamlit para visualizar dados de consumo e geração de energia.
+This repository hosts an interactive dashboard built with Streamlit for visualizing energy consumption and generation data.
 
-## Recursos
+## Features
 
-- Visualização de consumo de energia por localidade.
-- Análise da distribuição mensal de energia injetada.
-- Sugestões de distribuição de energia baseadas no consumo.
+- Energy consumption visualization by location.
+- Monthly distribution analysis of injected energy.
+- Energy distribution suggestions based on consumption patterns.
 
-## Como Usar
+## How to Use
 
-Para executar o dashboard localmente, clone o repositório e execute:
+To run the dashboard locally, clone the repository and execute:
 
 streamlit run app.py
 
 ## Dados
 
-Os dados utilizados são fornecidos no arquivo `Dados.xlsx`.
+The utilized data is provided in the `Data.xlsx` file.
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://energia-fazenda.streamlit.app)
 
