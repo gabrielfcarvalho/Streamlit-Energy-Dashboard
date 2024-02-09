@@ -14,7 +14,7 @@ To run the dashboard locally, clone the repository and execute:
 
 streamlit run app.py
 
-## Dados
+## Data
 
 The utilized data is provided in the `Data.xlsx` file.
 
