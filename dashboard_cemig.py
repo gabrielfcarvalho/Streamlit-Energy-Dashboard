@@ -42,6 +42,7 @@ def calculate_metrics(data, start_period, end_period):
     total_energia_transferida = 0
     saldo_atual_geracao = 0
     consumo_pago_total = 0
+    consumo_por_localidade = {}
 
     # Criar lista de meses/anos mantendo a ordem original
     all_dates = []
@@ -64,6 +65,7 @@ def calculate_metrics(data, start_period, end_period):
         total_energia_transferida += filtered_df['Energia Transferida em kWh'].sum()
         saldo_atual_geracao += filtered_df['Saldo Atual de Geração em kWh'].iloc[-1]  # Assumindo que o saldo mais recente é relevante
         consumo_pago_total += filtered_df['Consumo Pago em kWh'].sum()
+        consumo_por_localidade[loc] = filtered_df['Consumo Total em kWh'].sum()
 
     # Tratamento específico para 'Sapecado 1'
     if 'Sapecado 1' in data:
@@ -87,6 +89,7 @@ def calculate_metrics(data, start_period, end_period):
         "Consumo Pago Total": consumo_pago_total,
         "Porcentagem de Energia Compensada": pct_energia_compensada,
         "Economia com Compensação": economia_compensacao,
+        "Consumo por Localidade": consumo_por_localidade,
     }
 
 # Função para exibir a página de métricas com um layout personalizado
@@ -134,6 +137,19 @@ def show_metrics_page():
             st.metric("Porcentagem de Energia Compensada", f"{metrics['Porcentagem de Energia Compensada']:.2f}%")
         with col2:
             st.metric("Economia com Compensação (R$)", f"R$ {metrics['Economia com Compensação']:.2f}")
+
+        # Exibe o consumo total por localidade
+    with st.expander("Consumo Total por Localidade", expanded=False):
+        consumo_por_localidade = metrics['Consumo por Localidade']
+        total_consumo_geral = sum(consumo_por_localidade.values())  # Calcula o total de consumo geral para o período
+        for loc, consumo in consumo_por_localidade.items():
+            st.metric(label=f"{loc}", value=f"{consumo:.2f} kWh")
+        if total_consumo_geral > 0:
+            for loc, consumo in consumo_por_localidade.items():
+                proporcao = (consumo / total_consumo_geral) * 100  # Calcula a proporção
+                st.metric(label=f"{loc}", value=f"{consumo:.2f} kWh", delta=f"{proporcao:.2f}% do total")
+        else:
+            st.write("Não há consumo registrado para o período selecionado.")
 
     st.markdown("<hr>", unsafe_allow_html=True)
 
