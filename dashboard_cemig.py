@@ -146,6 +146,9 @@ def show_metrics_page():
             for loc, consumo in consumo_por_localidade.items():
                 proporcao = (consumo / total_consumo_geral) * 100  # Calcula a proporção
                 st.metric(label=f"{loc}", value=f"{consumo:.2f} kWh", delta=f"{proporcao:.2f}% do total")
+            fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
+            fig.update_layout(title_text="Proporção de Consumo por Localidade")
+            st.plotly_chart(fig)
         else:
             st.write("Não há consumo registrado para o período selecionado.")
 
