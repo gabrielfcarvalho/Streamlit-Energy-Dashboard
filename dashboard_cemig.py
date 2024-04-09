@@ -47,7 +47,8 @@ def calculate_metrics(data, start_period, end_period):
     for df in data.values():
         for date in df['Mês/Ano']:
             if date not in all_dates:
-                all_dates.append(date)
+                if pd.notnull(data):
+                    all_dates.append(date)
 
     # Obtendo os índices das datas inicial e final na lista ordenada
     start_index = all_dates.index(start_period)
