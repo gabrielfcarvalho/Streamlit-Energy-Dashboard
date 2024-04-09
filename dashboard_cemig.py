@@ -23,7 +23,7 @@ def setup_metrics(data):
         for df in data.values():
             for date in df['Mês/Ano']:
                 if date not in all_dates:
-                    if pd.notnull(date):
+                    if pd.notnull(date) or (not date == 0):
                         all_dates.append(date)
 
         # Seletores para escolher o período de referência com rótulos
