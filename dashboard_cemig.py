@@ -57,7 +57,7 @@ def calculate_metrics(data, start_period, end_period):
     end_index = all_dates.index(end_period)
  
     # Processando cada dataframe e somando os valores
-    for loc, df in data.values():
+    for loc, df in data.items():
         filtered_df = df[df['Mês/Ano'].isin(all_dates[start_index:end_index + 1])]
         total_consumo += filtered_df['Consumo Total em kWh'].sum()
         total_custo += filtered_df['Valor a Pagar (R$)'].sum()
