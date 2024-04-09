@@ -142,6 +142,8 @@ def show_metrics_page():
     with st.expander("Consumo Total por Localidade", expanded=False):
         consumo_por_localidade = metrics['Consumo por Localidade']
         total_consumo_geral = sum(consumo_por_localidade.values())  # Calcula o total de consumo geral para o período
+        labels = list(consumo_por_localidade.keys())
+        values = [consumo / total_consumo_geral for consumo in consumo_por_localidade.values()]
         if total_consumo_geral > 0:
             for loc, consumo in consumo_por_localidade.items():
                 proporcao = (consumo / total_consumo_geral) * 100  # Calcula a proporção
