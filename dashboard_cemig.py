@@ -254,7 +254,7 @@ def setup_distribution_sidebar(data):
 
         # Entrada para o número de meses futuros a serem analisados
         st.markdown("Defina o período futuro para análise:")
-        num_meses_futuro = st.number_input('Número de meses futuros:', min_value=1, max_value=12, value=1)
+        num_meses_futuro = st.number_input('Número de meses futuros:', min_value=1, value=1)
 
         return selected_month, num_meses_futuro
 
